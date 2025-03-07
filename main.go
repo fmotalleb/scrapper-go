@@ -55,17 +55,17 @@ func generateVariables(varsConfig []config.Variable) map[string]func() string {
 	for _, v := range varsConfig {
 		switch {
 		case v.Random == "once":
-			value := randomString(v.RandomItems, v.RandomLength) + v.Postfix
+			value := v.Prefix + randomString(v.RandomChars, v.RandomLength) + v.Postfix
 			vars[v.Name] = func() string {
 				return value
 			}
 		case v.Random == "always":
 			vars[v.Name] = func() string {
-				return randomString(v.RandomItems, v.RandomLength) + v.Postfix
+				return v.Prefix + randomString(v.RandomChars, v.RandomLength) + v.Postfix
 			}
 		case v.Value != "":
 			vars[v.Name] = func() string {
-				return v.Value + v.Postfix
+				return v.Prefix + v.Value + v.Postfix
 			}
 		default:
 			log.Fatalf("unknown variable type: %v", v)
