@@ -12,7 +12,7 @@ import (
 
 func main() {
 	viper.SetConfigName("config")
-	viper.SetConfigType("yaml")
+	viper.SetConfigType("json")
 	viper.AddConfigPath(".")
 
 	if err := viper.ReadInConfig(); err != nil {

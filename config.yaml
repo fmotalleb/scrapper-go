@@ -5,17 +5,17 @@ pipeline:
   vars:
     - name: random
       random: always
-      random_items: "abcdefghijklmnopqrstuvwxyz"
+      random_chars: "abcdefghijklmnopqrstuvwxyz"
       random_length: 10
     - name: email
       random: once
-      random_items: "abcdefghijklmnopqrstuvwxyz123456789"
+      random_chars: "abcdefghijklmnopqrstuvwxyz123456789"
       random_length: 10
       postfix: "@gmail.com"
     - name: password
       random: once
       random_length: 10
-      random_items: "abcdefghijklmnopqrstuvwxyz123456789"
+      random_chars: "abcdefghijklmnopqrstuvwxyz123456789"
   steps:
     - goto: https://docs.apryse.com/try-now
     - click: "nav > div > div.flex.items-center.lg\\:mx-2 > div:nth-child(1) > button"
