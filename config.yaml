@@ -1,7 +1,7 @@
 pipeline:
   browser: chromium
   browser_params:
-    headless: false
+    headless: true
   vars:
     - name: random
       random: always
