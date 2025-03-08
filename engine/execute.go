@@ -41,7 +41,7 @@ func executeStep(page playwright.Page, step config.Step, vars map[string]func() 
 		return nil
 	case step["print"] != nil:
 		selector := step["print"].(string)
-		value, err := page.Locator(selector).InputValue()
+		value, err := page.Locator(selector).TextContent()
 		if err != nil {
 			return err
 		}

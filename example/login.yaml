@@ -1,0 +1,13 @@
+pipeline:
+  browser: chromium
+  browser_params:
+    headless: false
+  steps:
+    - goto:
+    - fill: "form > label:nth-child(5) > input[type=text]"
+      value: ""
+    - fill: "form > label:nth-child(6) > input[type=password]:nth-child(2)"
+      value: ""
+    - click: "form > input[type=submit]:nth-child(7)"
+    - print: "body > div > div > div > h1"
+    - print: "body > div > div > div > form > table > tbody > tr:nth-child(1)"
