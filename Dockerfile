@@ -27,4 +27,4 @@ RUN /usr/bin/scrapper-go setup
 WORKDIR /home/scrapper
 
 ENTRYPOINT ["/usr/bin/scrapper-go" ]
-CMD ["-c","/config.yaml"]
+CMD ["--config","/config.yaml"]

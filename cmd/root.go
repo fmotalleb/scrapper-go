@@ -75,7 +75,7 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig)
 
-	rootCmd.Flags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.scrapper-go.yaml)")
+	rootCmd.Flags().StringVarP(&cfgFile, "config", "c", "", "config file (default is $HOME/.scrapper-go.yaml)")
 	format := rootCmd.Flags().String("format", "json", "output format (json,yaml) defaults to json")
 	outputFormat = utils.Output(*format)
 	rootCmd.PersistentFlags().StringVar(&logLevel, "log-level", "WARN", "Log Level (DEBUG INFO WARN ERROR) set to DEBUG for verbose logging")
