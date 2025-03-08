@@ -10,6 +10,18 @@ import (
 
 type executionEngine func(config.Step, Vars, playwright.Page) error
 
+var executors = map[string]executionEngine{
+	"nop":     func(s config.Step, v Vars, p playwright.Page) error { return nil },
+	"sleep":   sleep,
+	"select":  selectInput,
+	"fill":    fillInput,
+	"click":   click,
+	"exec":    executeJs,
+	"print":   elementSelector,
+	"element": elementSelector,
+	"goto":    gotoPage,
+}
+
 func executeStep(page playwright.Page, step config.Step, vars Vars) error {
 	ok, err := evaluateExpression(step, vars)
 	if err != nil {
@@ -24,18 +36,6 @@ func executeStep(page playwright.Page, step config.Step, vars Vars) error {
 		}
 	}
 	return fmt.Errorf("unknown step action: %v", step)
-}
-
-var executors = map[string]executionEngine{
-	"nop":     func(s config.Step, v Vars, p playwright.Page) error { return nil },
-	"sleep":   sleep,
-	"select":  selectInput,
-	"fill":    fillInput,
-	"click":   click,
-	"exec":    executeJs,
-	"print":   elementSelector,
-	"element": elementSelector,
-	"goto":    gotoPage,
 }
 
 func evaluateExpression(step config.Step, vars Vars) (bool, error) {
