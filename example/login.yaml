@@ -1,8 +1,9 @@
 pipeline:
   browser: chromium
-  keep_running: 5m
+  # keep_running: 5m
   browser_params:
     headless: false
   steps:
     - goto: http://internet.dornica-co.local/status
     - exec: "'test'"
+      set-var: data
