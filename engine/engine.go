@@ -2,6 +2,7 @@ package engine
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/fmotalleb/scrapper-go/config"
 	"github.com/playwright-community/playwright-go"
@@ -15,12 +16,18 @@ func ExecuteConfig(config config.ExecutionConfig) error {
 	if err != nil {
 		return fmt.Errorf("could not start Playwright: %v", err)
 	}
-	defer pw.Stop()
+	defer func() {
+
+		if err := pw.Stop(); err != nil {
+			fmt.Println("Failed to stop the session")
+		}
+	}()
 
 	browser, err := pw.Chromium.Launch(config.Pipeline.BrowserParams)
 	if err != nil {
 		return fmt.Errorf("could not launch browser: %v", err)
 	}
+
 	defer browser.Close()
 
 	page, err := browser.NewPage()
@@ -32,6 +39,13 @@ func ExecuteConfig(config config.ExecutionConfig) error {
 		if err := executeStep(page, step, vars); err != nil {
 			return fmt.Errorf("Error executing step: %v, step: %v", err, step)
 		}
+	}
+	if config.Pipeline.KeepRunning != "" {
+		sleepTime, err := time.ParseDuration(config.Pipeline.KeepRunning)
+		if err != nil {
+			return fmt.Errorf("cannot parse given duration in keep running: %s", config.Pipeline.KeepRunning)
+		}
+		time.Sleep(sleepTime)
 	}
 	return nil
 }

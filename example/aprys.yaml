@@ -1,7 +1,8 @@
 pipeline:
   browser: chromium
+  keep_running: 5m
   browser_params:
-    headless: true
+    headless: false
   vars:
     - name: random
       random: always
@@ -36,3 +37,4 @@ pipeline:
     - goto: "https://docs.apryse.com/web/guides/get-started/react"
     - click: "body > div.relative.flex > div.h-full.w-full.flex-1 > div > div.min-h-\\[calc\\(100vh_-_144px\\)\\].flex-1.overflow-x-hidden.px-4.pb-12.sm\\:px-8 > div.mb-20.mt-4 > div.my-4.min-w-\\[207px\\] > div.text-secondary.bg-secondary.flex.flex-col.gap-2.p-4 > div:nth-child(1) > div > div.my-2 > button"
     - print: "#key-value"
+      is-input: true
