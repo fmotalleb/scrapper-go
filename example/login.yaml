@@ -1,9 +1,11 @@
 pipeline:
   browser: chromium
-  # keep_running: 5m
+  keep_running: 5m
   browser_params:
-    headless: false
+    headless: true
+
   steps:
-    - goto: http://internet.dornica-co.local/status
-    - exec: "'test'"
-      set-var: data
+    - goto: https://bot.sannysoft.com/
+    - screenshot: body
+      screenshot_params:
+        path: "./screenshot2.png"

@@ -8,6 +8,7 @@ import (
 	"github.com/fmotalleb/scrapper-go/config"
 	"github.com/fmotalleb/scrapper-go/query"
 	"github.com/fmotalleb/scrapper-go/utils"
+	"github.com/mitchellh/mapstructure"
 	"github.com/playwright-community/playwright-go"
 	"golang.org/x/exp/slog"
 )
@@ -15,16 +16,17 @@ import (
 type executionEngine func(playwright.Page, config.Step, Vars, map[string]any) error
 
 var executors = map[string]executionEngine{
-	"nop":     nop,
-	"sleep":   sleep,
-	"select":  selectInput,
-	"fill":    fillInput,
-	"click":   click,
-	"exec":    executeJs,
-	"print":   elementSelector,
-	"element": elementSelector,
-	"table":   table,
-	"goto":    gotoPage,
+	"nop":        nop,
+	"sleep":      sleep,
+	"select":     selectInput,
+	"fill":       fillInput,
+	"click":      click,
+	"exec":       executeJs,
+	"print":      elementSelector,
+	"element":    elementSelector,
+	"table":      table,
+	"goto":       gotoPage,
+	"screenshot": screenshot,
 }
 
 func executeStep(page playwright.Page, step config.Step, vars Vars, result map[string]any) error {
@@ -192,3 +194,34 @@ func setVar(step config.Step, value interface{}, vars Vars, result map[string]an
 }
 
 func nop(p playwright.Page, s config.Step, v Vars, r map[string]any) error { return nil }
+
+func screenshot(page playwright.Page, step config.Step, vars Vars, result map[string]any) error {
+	selector := step["screenshot"].(string)
+
+	lso, err := readParams[playwright.LocatorScreenshotOptions](step)
+	if err != nil {
+		return err
+	}
+
+	if lso.Path == nil {
+		loc := "./screenshot.png"
+		lso.Path = &loc
+	}
+
+	locator := page.Locator(selector)
+
+	_, err = locator.Screenshot(*lso)
+	return err
+}
+
+func readParams[T any](step config.Step) (*T, error) {
+	params, _ := step["params"].(map[string]any)
+	if params == nil {
+		params = make(map[string]any)
+	}
+	var item T
+	if err := mapstructure.Decode(params, &item); err != nil {
+		return nil, err
+	}
+	return &item, nil
+}
