@@ -79,6 +79,7 @@ func selectInput(page playwright.Page, step config.Step, vars Vars, result map[s
 	} else if step["value"] != nil {
 		value = step["value"].(string)
 	}
+
 	if _, err := page.Locator(selector).SelectOption(playwright.SelectOptionValues{
 		Values: &[]string{value},
 	}); err != nil {

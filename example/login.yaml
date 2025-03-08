@@ -2,7 +2,7 @@ pipeline:
   browser: chromium
   keep_running: 5m
   browser_params:
-    headless: true
+    headless: false
 
   steps:
     - goto: https://bot.sannysoft.com/
