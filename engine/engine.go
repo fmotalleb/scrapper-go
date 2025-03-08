@@ -11,7 +11,9 @@ import (
 
 func ExecuteConfig(config config.ExecutionConfig) (map[string]any, error) {
 	vars := initializeVariables(config.Pipeline.Vars)
+	var err error
 	pw, err := playwright.Run()
+
 	if err != nil {
 		slog.Error("could not start Playwright", slog.Any("err", err))
 		return nil, fmt.Errorf("could not start Playwright: %v", err)
@@ -23,15 +25,24 @@ func ExecuteConfig(config config.ExecutionConfig) (map[string]any, error) {
 	}()
 
 	slog.Info("Playwright initialized")
+	var browser playwright.Browser
 
-	browser, err := pw.Chromium.Launch(config.Pipeline.BrowserParams)
+	switch config.Pipeline.Browser {
+	case "chromium":
+		browser, err = pw.Chromium.Launch(config.Pipeline.BrowserParams)
+	case "firefox":
+		browser, err = pw.Firefox.Launch(config.Pipeline.BrowserParams)
+	case "webkit":
+		browser, err = pw.WebKit.Launch(config.Pipeline.BrowserParams)
+	}
+
 	if err != nil {
 		slog.Error("could not launch browser", slog.Any("err", err))
 		return nil, fmt.Errorf("could not launch browser: %v", err)
 	}
 	defer browser.Close()
 
-	page, err := browser.NewPage()
+	page, err := browser.NewPage(config.Pipeline.BrowserOptions)
 	if err != nil {
 		slog.Error("could not create page", slog.Any("err", err))
 		return nil, fmt.Errorf("could not create page: %v", err)

@@ -7,11 +7,12 @@ type ExecutionConfig struct {
 }
 
 type Pipeline struct {
-	KeepRunning   string                              `mapstructure:"keep_running"`
-	Browser       string                              `mapstructure:"browser"`
-	BrowserParams playwright.BrowserTypeLaunchOptions `mapstructure:"browser_params"`
-	Vars          []Variable                          `mapstructure:"vars"`
-	Steps         []Step                              `mapstructure:"steps"`
+	KeepRunning    string                              `mapstructure:"keep_running"`
+	Browser        string                              `mapstructure:"browser"`
+	BrowserParams  playwright.BrowserTypeLaunchOptions `mapstructure:"browser_params"`
+	BrowserOptions playwright.BrowserNewPageOptions    `mapstructure:"browser_page_options"`
+	Vars           []Variable                          `mapstructure:"vars"`
+	Steps          []Step                              `mapstructure:"steps"`
 }
 
 type Variable struct {
