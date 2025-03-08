@@ -1,3 +1,4 @@
+// Package engine contains core functionality of scrapper machine
 package engine
 
 import (
@@ -13,7 +14,6 @@ func ExecuteConfig(config config.ExecutionConfig) (map[string]any, error) {
 	vars := initializeVariables(config.Pipeline.Vars)
 	var err error
 	pw, err := playwright.Run()
-
 	if err != nil {
 		slog.Error("could not start Playwright", slog.Any("err", err))
 		return nil, fmt.Errorf("could not start Playwright: %v", err)
@@ -40,7 +40,11 @@ func ExecuteConfig(config config.ExecutionConfig) (map[string]any, error) {
 		slog.Error("could not launch browser", slog.Any("err", err))
 		return nil, fmt.Errorf("could not launch browser: %v", err)
 	}
-	defer browser.Close()
+	defer func() {
+		if err := browser.Close(); err != nil {
+			slog.Error("failed to close browser", slog.Any("err", err))
+		}
+	}()
 
 	page, err := browser.NewPage(config.Pipeline.BrowserOptions)
 	if err != nil {
@@ -53,7 +57,7 @@ func ExecuteConfig(config config.ExecutionConfig) (map[string]any, error) {
 		slog.Debug("Executing step", slog.Any("step", step))
 		if err := executeStep(page, step, vars, result); err != nil {
 			slog.Error("Error executing step", slog.Any("err", err), slog.Any("step", step))
-			return result, fmt.Errorf("Error executing step: %v, step: %v", err, step)
+			return result, fmt.Errorf("error executing step: %v, step: %v", err, step)
 		}
 	}
 

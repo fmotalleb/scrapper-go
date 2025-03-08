@@ -9,8 +9,10 @@ import (
 	"github.com/fmotalleb/scrapper-go/utils"
 )
 
-type getter = func() string
-type Vars map[string]getter
+type (
+	getter func() string
+	Vars   map[string]getter
+)
 
 func (v Vars) Snapshot() map[string]string {
 	data := make(map[string]string)
@@ -27,9 +29,11 @@ func (v Vars) SetOnce(key string, value string) {
 		return value
 	}
 }
+
 func (v Vars) SetGetter(key string, getter getter) {
 	v[key] = getter
 }
+
 func (v Vars) Get(key string) (string, bool) {
 	getter, ok := v[key]
 	return getter(), ok

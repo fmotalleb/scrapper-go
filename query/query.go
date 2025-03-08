@@ -1,4 +1,5 @@
-package engine
+// Package query contains core functionality of internal scripting engine
+package query
 
 import (
 	"fmt"

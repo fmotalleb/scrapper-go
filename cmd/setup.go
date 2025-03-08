@@ -1,9 +1,7 @@
-/*
-Copyright © 2025 NAME HERE <EMAIL ADDRESS>
-*/
 package cmd
 
 import (
+	"log/slog"
 	"strings"
 
 	"github.com/playwright-community/playwright-go"
@@ -23,7 +21,7 @@ var setupCmd = &cobra.Command{
 	Use:   "setup",
 	Short: "Installs every integration needed for application to bootup",
 	Run: func(cmd *cobra.Command, args []string) {
-		playwright.Install(
+		if err := playwright.Install(
 			&playwright.RunOptions{
 				OnlyInstallShell:    onlyInstallShell,
 				DriverDirectory:     driverDirectory,
@@ -32,7 +30,9 @@ var setupCmd = &cobra.Command{
 				DryRun:              dryRun,
 				Browsers:            browsers,
 			},
-		)
+		); err != nil {
+			slog.Error("failed to install playwright's dependencies", slog.Any("err", err))
+		}
 	},
 }
 

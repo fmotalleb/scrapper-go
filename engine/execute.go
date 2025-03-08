@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/fmotalleb/scrapper-go/config"
+	"github.com/fmotalleb/scrapper-go/query"
 	"github.com/playwright-community/playwright-go"
 )
 
@@ -43,7 +44,7 @@ func evaluateExpression(step config.Step, vars Vars) (bool, error) {
 	if !ok {
 		return true, nil
 	}
-	query, err := ParseQuery(cond)
+	query, err := query.ParseQuery(cond)
 	if err != nil {
 		return false, err
 	}

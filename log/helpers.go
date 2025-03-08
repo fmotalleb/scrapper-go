@@ -1,11 +1,10 @@
+// Package log contains utilities for logging system
 package log
 
 import (
 	"log/slog"
 	"os"
 )
-
-var RootLogger *slog.Logger
 
 func SetupLogger(level string) error {
 	var lvl slog.Level
