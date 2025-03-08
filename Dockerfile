@@ -10,7 +10,7 @@ RUN CGO_ENABLED=0 go build -o scrapper-go
 RUN chmod +x scrapper-go
 
 
-FROM library/debian:bookworm-slim AS runner
+FROM library/debian:bookworm-slim AS slim
 RUN --mount=type=cache,target=/var/lib/apt/lists/ \
   --mount=type=cache,target=/var/cache/apt/archives/ <<EOF
 apt update  || exit 1
