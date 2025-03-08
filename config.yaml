@@ -1,5 +1,5 @@
 pipeline:
-  browser: chromium
+  browser: chrome
   browser_params:
     headless: true
   vars:

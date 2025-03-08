@@ -19,6 +19,7 @@ package cmd
 import (
 	"fmt"
 	"log"
+	"log/slog"
 	"os"
 
 	"github.com/fmotalleb/scrapper-go/config"
@@ -38,7 +39,11 @@ var rootCmd = &cobra.Command{
 	Short: "A Simple playwright wrapper that executes a simple yaml pipeline",
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
+	Run: func(cmd *cobra.Command, args []string) {
+		if err := engine.ExecuteConfig(cfg); err != nil {
+			slog.Error(fmt.Sprintf("Error: %s", err))
+		}
+	},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -48,7 +53,7 @@ func Execute() {
 	if err != nil {
 		os.Exit(1)
 	}
-	engine.ExecuteConfig(cfg)
+
 }
 
 func init() {
@@ -62,7 +67,6 @@ func init() {
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
 // initConfig reads in config file and ENV variables if set.
