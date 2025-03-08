@@ -35,6 +35,7 @@ func ExecuteConfig(config config.ExecutionConfig) (map[string]any, error) {
 	case "webkit":
 		browser, err = pw.WebKit.Launch(config.Pipeline.BrowserParams)
 	}
+	result := make(map[string]any)
 
 	if err != nil {
 		slog.Error("could not launch browser", slog.Any("err", err))
@@ -45,14 +46,23 @@ func ExecuteConfig(config config.ExecutionConfig) (map[string]any, error) {
 			slog.Error("failed to close browser", slog.Any("err", err))
 		}
 	}()
-
+	defer func() {
+		if config.Pipeline.KeepRunning != "" {
+			sleepTime, err := time.ParseDuration(config.Pipeline.KeepRunning)
+			if err != nil {
+				slog.Error("Cannot parse duration in KeepRunning", slog.Any("err", err))
+				return
+			}
+			slog.Info("Sleeping for duration", slog.Duration("duration", sleepTime))
+			time.Sleep(sleepTime)
+		}
+	}()
 	page, err := browser.NewPage(config.Pipeline.BrowserOptions)
 	if err != nil {
 		slog.Error("could not create page", slog.Any("err", err))
 		return nil, fmt.Errorf("could not create page: %v", err)
 	}
 
-	result := make(map[string]any)
 	for _, step := range config.Pipeline.Steps {
 		slog.Debug("Executing step", slog.Any("step", step))
 		if err := executeStep(page, step, vars, result); err != nil {
@@ -62,16 +72,6 @@ func ExecuteConfig(config config.ExecutionConfig) (map[string]any, error) {
 	}
 
 	slog.Info("Execution finished", slog.Any("vars_snapshot", vars.Snapshot()), slog.Any("result", result))
-
-	if config.Pipeline.KeepRunning != "" {
-		sleepTime, err := time.ParseDuration(config.Pipeline.KeepRunning)
-		if err != nil {
-			slog.Error("Cannot parse duration in KeepRunning", slog.Any("err", err))
-			return result, fmt.Errorf("cannot parse given duration in keep running: %s", config.Pipeline.KeepRunning)
-		}
-		slog.Info("Sleeping for duration", slog.Duration("duration", sleepTime))
-		time.Sleep(sleepTime)
-	}
 
 	return result, nil
 }
