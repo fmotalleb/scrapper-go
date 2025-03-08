@@ -2,6 +2,7 @@ package engine
 
 import (
 	"fmt"
+	"log/slog"
 	"time"
 
 	"github.com/fmotalleb/scrapper-go/config"
@@ -9,9 +10,7 @@ import (
 )
 
 func ExecuteConfig(config config.ExecutionConfig) error {
-
-	vars := generateVariables(config.Pipeline.Vars)
-
+	vars := initializeVariables(config.Pipeline.Vars)
 	pw, err := playwright.Run()
 	if err != nil {
 		return fmt.Errorf("could not start Playwright: %v", err)
@@ -40,6 +39,8 @@ func ExecuteConfig(config config.ExecutionConfig) error {
 			return fmt.Errorf("Error executing step: %v, step: %v", err, step)
 		}
 	}
+
+	slog.Info(fmt.Sprintf("%v", vars.Snapshot()))
 	if config.Pipeline.KeepRunning != "" {
 		sleepTime, err := time.ParseDuration(config.Pipeline.KeepRunning)
 		if err != nil {
@@ -47,5 +48,6 @@ func ExecuteConfig(config config.ExecutionConfig) error {
 		}
 		time.Sleep(sleepTime)
 	}
+
 	return nil
 }
