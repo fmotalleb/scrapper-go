@@ -47,6 +47,10 @@ func executeStep(page playwright.Page, step config.Step, vars Vars, result map[s
 
 func evaluateExpression(step config.Step, vars Vars) (bool, error) {
 	cond, ok := step["if"].(string)
+	cond, err := applyTemplate(cond, vars)
+	if err != nil {
+		return false, err
+	}
 	if !ok {
 		return true, nil
 	}
@@ -59,6 +63,10 @@ func evaluateExpression(step config.Step, vars Vars) (bool, error) {
 
 func sleep(page playwright.Page, step config.Step, vars Vars, result map[string]any) error {
 	waitTime := step["sleep"].(string)
+	waitTime, err := applyTemplate(waitTime, vars)
+	if err != nil {
+		return err
+	}
 	value, err := time.ParseDuration(waitTime)
 	if err != nil {
 		return nil
@@ -69,6 +77,10 @@ func sleep(page playwright.Page, step config.Step, vars Vars, result map[string]
 
 func selectInput(page playwright.Page, step config.Step, vars Vars, result map[string]any) error {
 	selector := step["select"].(string)
+	selector, err := applyTemplate(selector, vars)
+	if err != nil {
+		return err
+	}
 	value := ""
 	if step["var"] != nil {
 		var err error
@@ -78,6 +90,10 @@ func selectInput(page playwright.Page, step config.Step, vars Vars, result map[s
 		}
 	} else if step["value"] != nil {
 		value = step["value"].(string)
+	}
+	value, err = applyTemplate(selector, vars)
+	if err != nil {
+		return err
 	}
 
 	if _, err := page.Locator(selector).SelectOption(playwright.SelectOptionValues{
@@ -90,6 +106,10 @@ func selectInput(page playwright.Page, step config.Step, vars Vars, result map[s
 
 func fillInput(page playwright.Page, step config.Step, vars Vars, result map[string]any) error {
 	selector := step["fill"].(string)
+	selector, err := applyTemplate(selector, vars)
+	if err != nil {
+		return err
+	}
 	value := ""
 	if step["var"] != nil {
 		var err error
@@ -100,11 +120,19 @@ func fillInput(page playwright.Page, step config.Step, vars Vars, result map[str
 	} else if step["value"] != nil {
 		value = step["value"].(string)
 	}
+	value, err = applyTemplate(selector, vars)
+	if err != nil {
+		return err
+	}
 	return page.Locator(selector).Fill(value)
 }
 
 func click(page playwright.Page, step config.Step, vars Vars, result map[string]any) error {
 	selector := step["click"].(string)
+	selector, err := applyTemplate(selector, vars)
+	if err != nil {
+		return err
+	}
 	return page.Locator(selector).Click()
 }
 
