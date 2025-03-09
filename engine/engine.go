@@ -4,12 +4,36 @@ package engine
 import (
 	"fmt"
 	"log/slog"
+	"reflect"
+	"strings"
 	"time"
 
 	"github.com/fmotalleb/scrapper-go/config"
 	"github.com/playwright-community/playwright-go"
 )
 
+func testFrame(page playwright.Page) {
+	frame, err := page.WaitForEvent("framenavigated")
+	go func() {
+		if err != nil {
+			slog.Error("frame not detected", slog.Any("err", err))
+		} else {
+			val := reflect.ValueOf(frame)
+			if val.Kind() == reflect.Ptr {
+				val = val.Elem() // Dereference pointer
+			}
+			field := val.FieldByName("url")
+			var fr playwright.Frame
+			fr = frame.(playwright.Frame)
+			if strings.Contains(field.String(), "https://challenges.cloudflare.com/") {
+				slog.Info("frame detected", slog.Any("frame", fr), slog.Any("url", field))
+				fr.Locator("div > label > input[type=checkbox]").Click()
+			}
+		}
+	}()
+
+	testFrame(page)
+}
 func ExecuteConfig(config config.ExecutionConfig) (map[string]any, error) {
 	vars := initializeVariables(config.Pipeline.Vars)
 	var err error
@@ -58,6 +82,8 @@ func ExecuteConfig(config config.ExecutionConfig) (map[string]any, error) {
 		}
 	}()
 	page, err := browser.NewPage(config.Pipeline.BrowserOptions)
+
+	go testFrame(page)
 	if err != nil {
 		slog.Error("could not create page", slog.Any("err", err))
 		return nil, fmt.Errorf("could not create page: %v", err)

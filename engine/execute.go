@@ -231,7 +231,6 @@ func nop(p playwright.Page, s config.Step, v Vars, r map[string]any) error { ret
 
 func screenshot(page playwright.Page, step config.Step, vars Vars, result map[string]any) error {
 	selector := step["screenshot"].(string)
-
 	lso, err := readParams[playwright.LocatorScreenshotOptions](step)
 	if err != nil {
 		return err
