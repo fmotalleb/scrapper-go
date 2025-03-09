@@ -91,7 +91,7 @@ func selectInput(page playwright.Page, step config.Step, vars Vars, result map[s
 	} else if step["value"] != nil {
 		value = step["value"].(string)
 	}
-	value, err = applyTemplate(selector, vars)
+	value, err = applyTemplate(value, vars)
 	if err != nil {
 		return err
 	}
@@ -120,7 +120,7 @@ func fillInput(page playwright.Page, step config.Step, vars Vars, result map[str
 	} else if step["value"] != nil {
 		value = step["value"].(string)
 	}
-	value, err = applyTemplate(selector, vars)
+	value, err = applyTemplate(value, vars)
 	if err != nil {
 		return err
 	}
