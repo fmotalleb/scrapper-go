@@ -138,6 +138,11 @@ func click(page playwright.Page, step config.Step, vars Vars, result map[string]
 
 func executeJs(page playwright.Page, step config.Step, vars Vars, result map[string]any) error {
 	script := step["exec"].(string)
+
+	script, err := applyTemplate(script, vars)
+	if err != nil {
+		return err
+	}
 	value, err := page.Evaluate(script)
 	if err != nil {
 		return err
