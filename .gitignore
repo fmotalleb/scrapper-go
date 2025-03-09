@@ -1,2 +1,3 @@
 scrapper-go
 .env
+.vscode/*.log
