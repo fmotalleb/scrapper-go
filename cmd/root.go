@@ -49,6 +49,10 @@ var rootCmd = &cobra.Command{
 		slog.Debug("Level Set To", slog.String("level", logLevel))
 	},
 	Run: func(cmd *cobra.Command, args []string) {
+		if len(cfg.Pipeline.Steps) == 0 {
+			slog.Error("pipeline is empty, use --help flag to see how to use cli")
+			os.Exit(1)
+		}
 		result, err := engine.ExecuteConfig(cfg)
 		if err != nil {
 			slog.Error("failed to execute command", slog.Any("err", err))
