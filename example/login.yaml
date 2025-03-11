@@ -5,7 +5,6 @@ pipeline:
     headless: false
 
   steps:
-    - goto: https://bot.sannysoft.com/
-    - screenshot: body
-      screenshot_params:
-        path: "./screenshot2.png"
+    - goto: https://www.google.com/
+    - if: |
+        {{ .page.Evaluate "15" }} is 15

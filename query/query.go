@@ -56,8 +56,8 @@ func ParseQuery(query string) (*Query, error) {
 func (q *Query) EvaluateQuery(data map[string]string) (bool, error) {
 	val, exists := data[q.Field]
 	if !exists {
-		slog.Warn("field not found", slog.String("field", q.Field))
-		return false, fmt.Errorf("field %s not found in data", q.Field)
+		slog.Info("field not found, evaluating as a fixed value", slog.String("field", q.Field))
+		val = q.Field
 	}
 
 	// Check if the operator exists and evaluate

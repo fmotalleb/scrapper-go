@@ -72,7 +72,7 @@ func ExecuteConfig(config config.ExecutionConfig) (map[string]any, error) {
 	for _, step := range config.Pipeline.Steps {
 		slog.Debug("Executing step", slog.Any("step", step))
 		if err := executeStep(page, step, vars, result); err != nil {
-			slog.Error("Error executing step", slog.Any("err", err), slog.Any("step", step))
+			slog.Error("error executing step", slog.Any("err", err), slog.Any("step", step))
 			return result, fmt.Errorf("error executing step: %v, step: %v", err, step)
 		}
 	}

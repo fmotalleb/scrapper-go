@@ -30,7 +30,7 @@ var executors = map[string]executionEngine{
 }
 
 func executeStep(page playwright.Page, step config.Step, vars Vars, result map[string]any) error {
-	ok, err := evaluateExpression(step, vars)
+	ok, err := evaluateExpression(page, step, vars)
 	if err != nil {
 		return err
 	} else if !ok {
@@ -45,9 +45,9 @@ func executeStep(page playwright.Page, step config.Step, vars Vars, result map[s
 	return fmt.Errorf("unknown step action: %v", step)
 }
 
-func evaluateExpression(step config.Step, vars Vars) (bool, error) {
+func evaluateExpression(page playwright.Page, step config.Step, vars Vars) (bool, error) {
 	cond, ok := step["if"].(string)
-	cond, err := applyTemplate(cond, vars)
+	cond, err := applyTemplate(cond, vars, page)
 	if err != nil {
 		return false, err
 	}
@@ -63,7 +63,7 @@ func evaluateExpression(step config.Step, vars Vars) (bool, error) {
 
 func sleep(page playwright.Page, step config.Step, vars Vars, result map[string]any) error {
 	waitTime := step["sleep"].(string)
-	waitTime, err := applyTemplate(waitTime, vars)
+	waitTime, err := applyTemplate(waitTime, vars, page)
 	if err != nil {
 		return err
 	}
@@ -77,7 +77,7 @@ func sleep(page playwright.Page, step config.Step, vars Vars, result map[string]
 
 func selectInput(page playwright.Page, step config.Step, vars Vars, result map[string]any) error {
 	selector := step["select"].(string)
-	selector, err := applyTemplate(selector, vars)
+	selector, err := applyTemplate(selector, vars, page)
 	if err != nil {
 		return err
 	}
@@ -91,7 +91,7 @@ func selectInput(page playwright.Page, step config.Step, vars Vars, result map[s
 	} else if step["value"] != nil {
 		value = step["value"].(string)
 	}
-	value, err = applyTemplate(value, vars)
+	value, err = applyTemplate(value, vars, page)
 	if err != nil {
 		return err
 	}
@@ -106,7 +106,7 @@ func selectInput(page playwright.Page, step config.Step, vars Vars, result map[s
 
 func fillInput(page playwright.Page, step config.Step, vars Vars, result map[string]any) error {
 	selector := step["fill"].(string)
-	selector, err := applyTemplate(selector, vars)
+	selector, err := applyTemplate(selector, vars, page)
 	if err != nil {
 		return err
 	}
@@ -120,7 +120,7 @@ func fillInput(page playwright.Page, step config.Step, vars Vars, result map[str
 	} else if step["value"] != nil {
 		value = step["value"].(string)
 	}
-	value, err = applyTemplate(value, vars)
+	value, err = applyTemplate(value, vars, page)
 	if err != nil {
 		return err
 	}
@@ -129,7 +129,7 @@ func fillInput(page playwright.Page, step config.Step, vars Vars, result map[str
 
 func click(page playwright.Page, step config.Step, vars Vars, result map[string]any) error {
 	selector := step["click"].(string)
-	selector, err := applyTemplate(selector, vars)
+	selector, err := applyTemplate(selector, vars, page)
 	if err != nil {
 		return err
 	}
@@ -139,7 +139,7 @@ func click(page playwright.Page, step config.Step, vars Vars, result map[string]
 func executeJs(page playwright.Page, step config.Step, vars Vars, result map[string]any) error {
 	script := step["exec"].(string)
 
-	script, err := applyTemplate(script, vars)
+	script, err := applyTemplate(script, vars, page)
 	if err != nil {
 		return err
 	}
