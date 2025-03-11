@@ -8,5 +8,7 @@ pipeline:
       value: test
   steps:
     - goto: https://tools.admin.dornicafile.ir/test.html
-    - table: table
+    - if: |
+        "{{ "156" | eval }}" is 156
+      table: table
       set-var: table

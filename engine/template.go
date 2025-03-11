@@ -19,7 +19,15 @@ func unShadow(data map[string]any, key string) map[string]any {
 	return data
 }
 func applyTemplate(text string, vars Vars, page playwright.Page) (string, error) {
-	tmpl, err := template.New("template").Parse(text)
+
+	tmpl := template.New("template")
+
+	tmpl = tmpl.Funcs(map[string]any{
+		"eval": page.Evaluate,
+	})
+
+	tmpl, err := tmpl.Parse(text)
+
 	if err != nil {
 		return "", fmt.Errorf("failed to parse template: %s", err)
 	}
