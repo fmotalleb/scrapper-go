@@ -11,8 +11,14 @@ import (
 )
 
 func ExecuteConfig(config config.ExecutionConfig) (map[string]any, error) {
-	vars := initializeVariables(config.Pipeline.Vars)
-	var err error
+	vars, err := initializeVariables(config.Pipeline.Vars)
+	if err != nil {
+		slog.Error("failed to load variables", slog.Any("err", err))
+		return nil, fmt.Errorf("could not start Preflight check failed: %v", err)
+	}
+	if len(config.Pipeline.Steps) == 0 {
+		return nil, fmt.Errorf("given pipeline does not have any steps, preflight check failed")
+	}
 	pw, err := playwright.Run()
 	if err != nil {
 		slog.Error("could not start Playwright", slog.Any("err", err))

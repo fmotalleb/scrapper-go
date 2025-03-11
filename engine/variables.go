@@ -2,7 +2,6 @@ package engine
 
 import (
 	"fmt"
-	"log"
 	"log/slog"
 
 	"github.com/fmotalleb/scrapper-go/config"
@@ -29,24 +28,23 @@ func (v *varValue) getValue() string {
 }
 
 func (v Vars) Snapshot() map[string]string {
-	data := make(map[string]string)
+	snap := make(map[string]string)
 	for k, g := range v {
-		data[k] = g.getValue()
+		snap[k] = g.getValue()
 	}
-	return data
+	return snap
 }
 
-func (v Vars) LiveSnapshot() map[string]interface{} {
-	data := make(map[string]interface{})
+func (v Vars) LiveSnapshot() map[string]any {
+	snap := make(map[string]any)
 	for k, g := range v {
 		if g.isGenerative {
-			data[k] = g.get
+			snap[k] = g.get
 		} else {
-			data[k] = g.value
+			snap[k] = g.value
 		}
-
 	}
-	return data
+	return snap
 }
 
 func (v Vars) SetOnce(key string, value string) {
@@ -85,19 +83,18 @@ func (v Vars) GetOrFail(key string) (string, error) {
 	return "", fmt.Errorf("use of undefined variable: %s", key)
 }
 
-func initializeVariables(varsConfig []config.Variable) Vars {
+func initializeVariables(varsConfig []config.Variable) (Vars, error) {
 	vars := make(Vars)
 
 	for _, v := range varsConfig {
 		// Log the variable being processed
-		slog.Debug("Processing variable", slog.Any("variable_name", v.Name), slog.Any("random", v.Random), slog.Any("value", v.Value))
+		slog.Debug("Processing variable", slog.Any("var", v))
 
 		switch {
 		case v.Random == "once":
 			value := v.Prefix + utils.RandomString(v.RandomChars, v.RandomLength) + v.Postfix
 			vars.SetOnce(v.Name, value)
-			slog.Info("Set variable once", slog.Any("name", v.Name), slog.Any("value", value))
-
+			slog.Debug("Set variable once", slog.Any("name", v.Name), slog.Any("value", value))
 		case v.Random == "always":
 			vars.SetGetter(
 				v.Name,
@@ -107,19 +104,17 @@ func initializeVariables(varsConfig []config.Variable) Vars {
 					return randomValue
 				},
 			)
-			slog.Info("Set variable getter", slog.Any("name", v.Name))
-
+			slog.Debug("Set variable getter", slog.Any("name", v.Name))
 		case v.Value != "":
 			finalValue := v.Prefix + v.Value + v.Postfix
 			vars.SetOnce(v.Name, finalValue)
-			slog.Info("Set variable once", slog.Any("name", v.Name), slog.Any("value", finalValue))
-
+			slog.Debug("Set variable once", slog.Any("name", v.Name), slog.Any("value", finalValue))
 		default:
 			slog.Error("Unknown variable type", slog.Any("variable", v))
-			log.Fatalf("unknown variable type: %v", v)
+			return nil, fmt.Errorf("unknown variable type: %v", v)
 		}
 	}
 
 	slog.Info("Variables initialization completed")
-	return vars
+	return vars, nil
 }

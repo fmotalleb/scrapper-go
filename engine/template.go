@@ -12,6 +12,7 @@ func applyTemplate(text string, vars Vars) (string, error) {
 		return "", fmt.Errorf("failed to parse template: %s", err)
 	}
 	variables := vars.LiveSnapshot()
+
 	output := bytes.NewBufferString("")
 	err = tmpl.Execute(output, variables)
 	if err != nil {
