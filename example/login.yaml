@@ -3,7 +3,9 @@ pipeline:
   keep_running: 5m
   browser_params:
     headless: false
-
+  vars:
+    - name: page
+      value: test
   steps:
     - goto: https://www.google.com/
     - if: |
