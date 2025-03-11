@@ -12,7 +12,8 @@
       "program": "${workspaceFolder}",
       "args": [
         "--config=example/login.yaml",
-        "--log-level=DEBUG"
+        "--format=yaml",
+        "--log-level=DEBUG",
       ]
     }
   ]

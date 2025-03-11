@@ -31,10 +31,10 @@ import (
 )
 
 var (
-	cfgFile      string
-	cfg          config.ExecutionConfig
-	outputFormat utils.Output
-	logLevel     string
+	cfgFile  string
+	cfg      config.ExecutionConfig
+	format   string
+	logLevel string
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -53,7 +53,8 @@ var rootCmd = &cobra.Command{
 		if err != nil {
 			slog.Error("failed to execute command", slog.Any("err", err))
 		}
-		formatted, err := outputFormat.Format(result)
+
+		formatted, err := utils.Output(format).Format(result)
 		if err != nil {
 			slog.Error("failed to format", slog.Any("err", err))
 			return
@@ -77,8 +78,8 @@ func init() {
 	cobra.OnInitialize(initConfig)
 
 	rootCmd.Flags().StringVarP(&cfgFile, "config", "c", "", "config file (default is $HOME/.scrapper-go.yaml)")
-	format := rootCmd.Flags().String("format", "json", "output format (json,yaml) defaults to json")
-	outputFormat = utils.Output(*format)
+	rootCmd.Flags().StringVar(&format, "format", "json", "output format (json,yaml) defaults to json")
+
 	rootCmd.PersistentFlags().StringVar(&logLevel, "log-level", "WARN", "Log Level (DEBUG INFO WARN ERROR) set to DEBUG for verbose logging")
 }
 

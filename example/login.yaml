@@ -1,12 +1,12 @@
 pipeline:
   browser: chromium
-  keep_running: 5m
+  # keep_running: 5m
   browser_params:
     headless: false
   vars:
     - name: page
       value: test
   steps:
-    - goto: https://www.google.com/
-    - if: |
-        {{ .page.Evaluate "15" }} is 15
+    - goto: https://tools.admin.dornicafile.ir/test.html
+    - table: table
+      set-var: table
