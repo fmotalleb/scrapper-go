@@ -33,16 +33,18 @@ type Query struct {
 }
 
 func ParseQuery(query string) (*Query, error) {
-	parts := strings.Fields(query)
-	if len(parts) < 3 {
+	// Regex to split while keeping quoted values intact
+	re := regexp.MustCompile(`"([^"]*)"|\S+`)
+	matches := re.FindAllString(query, -1)
+
+	if len(matches) < 3 {
 		slog.Error("invalid query format", slog.String("query", query))
 		return nil, fmt.Errorf("invalid query format: %s", query)
 	}
 
-	field := parts[0]
-	op := parts[1]
-	value := strings.Join(parts[2:], " ")
-	value = strings.Trim(value, "\"") // Remove surrounding quotes
+	field := strings.Trim(matches[0], "\"") // Ensure field is stripped of quotes
+	op := matches[1]
+	value := strings.Trim(strings.Join(matches[2:], " "), "\"") // Ensure value is stripped
 
 	if _, ok := operators[op]; !ok {
 		slog.Error("unsupported operator", slog.String("op", op))
@@ -60,7 +62,6 @@ func (q *Query) EvaluateQuery(data map[string]string) (bool, error) {
 		val = q.Field
 	}
 
-	// Check if the operator exists and evaluate
 	op, ok := operators[q.Op]
 	if !ok {
 		slog.Error("unknown operation", slog.String("op", q.Op))
