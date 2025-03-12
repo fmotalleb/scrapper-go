@@ -73,7 +73,13 @@ func ExecuteConfig(config config.ExecutionConfig) (map[string]any, error) {
 		slog.Debug("Executing step", slog.Any("step", step))
 		if err := executeStep(page, step, vars, result); err != nil {
 			slog.Error("error executing step", slog.Any("err", err), slog.Any("step", step))
-			return result, fmt.Errorf("error executing step: %v, step: %v", err, step)
+			switch step["on-error"] {
+			case "ignore":
+				slog.Warn("ignoring error", slog.Any("err", err))
+			default:
+				return result, fmt.Errorf("error executing step: %v, step: %v", err, step)
+			}
+
 		}
 	}
 

@@ -18,16 +18,13 @@ func unShadow(data map[string]any, key string) map[string]any {
 	}
 	return data
 }
-func applyTemplate(text string, vars Vars, page playwright.Page) (string, error) {
 
-	tmpl := template.New("template")
-
-	tmpl = tmpl.Funcs(map[string]any{
+func execTemplate(text string, vars Vars, page playwright.Page) (string, error) {
+	templateObj := template.New("template")
+	templateObj = templateObj.Funcs(map[string]any{
 		"eval": page.Evaluate,
 	})
-
-	tmpl, err := tmpl.Parse(text)
-
+	templateObj, err := templateObj.Parse(text)
 	if err != nil {
 		return "", fmt.Errorf("failed to parse template: %s", err)
 	}
@@ -38,7 +35,7 @@ func applyTemplate(text string, vars Vars, page playwright.Page) (string, error)
 	}
 	variables["page"] = page
 	output := bytes.NewBufferString("")
-	err = tmpl.Execute(output, variables)
+	err = templateObj.Execute(output, variables)
 	if err != nil {
 		return "", fmt.Errorf("failed to execute template using vars snapshot: %s", err)
 	}
