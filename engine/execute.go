@@ -13,23 +13,23 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-type executionEngine func(playwright.Page, config.Step, Vars, map[string]any) error
+type executionEngine func(playwright.Page, config.Step, utils.Vars, map[string]any) error
 
 var executors = map[string]executionEngine{
-	"nop":        nop,
-	"sleep":      sleep,
-	"select":     selectInput,
-	"fill":       fillInput,
-	"click":      click,
-	"exec":       executeJs,
-	"print":      elementSelector,
-	"element":    elementSelector,
-	"table":      table,
-	"goto":       gotoPage,
+	//"nop":        nop,
+	//"sleep":      sleep,
+	// "select":  selectInput,
+	// "fill":    fillInput,
+	// "click":   click,
+	"exec":    executeJs,
+	"print":   elementSelector,
+	"element": elementSelector,
+	"table":   table,
+	// "goto":       gotoPage,
 	"screenshot": screenshot,
 }
 
-func executeStep(page playwright.Page, step config.Step, vars Vars, result map[string]any) error {
+func executeStep(page playwright.Page, step config.Step, vars utils.Vars, result map[string]any) error {
 	ok, err := evaluateExpression(page, step, vars)
 	if err != nil {
 		return err
@@ -45,9 +45,9 @@ func executeStep(page playwright.Page, step config.Step, vars Vars, result map[s
 	return fmt.Errorf("unknown step action: %v", step)
 }
 
-func evaluateExpression(page playwright.Page, step config.Step, vars Vars) (bool, error) {
+func evaluateExpression(page playwright.Page, step config.Step, vars utils.Vars) (bool, error) {
 	cond, ok := step["if"].(string)
-	cond, err := execTemplate(cond, vars, page)
+	cond, err := utils.EvaluateTemplate(cond, vars, page)
 	if err != nil {
 		return false, err
 	}
@@ -61,9 +61,9 @@ func evaluateExpression(page playwright.Page, step config.Step, vars Vars) (bool
 	return query.EvaluateQuery(vars.Snapshot())
 }
 
-func sleep(page playwright.Page, step config.Step, vars Vars, result map[string]any) error {
+func sleep(page playwright.Page, step config.Step, vars utils.Vars, result map[string]any) error {
 	waitTime := step["sleep"].(string)
-	waitTime, err := execTemplate(waitTime, vars, page)
+	waitTime, err := utils.EvaluateTemplate(waitTime, vars, page)
 	if err != nil {
 		return err
 	}
@@ -75,9 +75,9 @@ func sleep(page playwright.Page, step config.Step, vars Vars, result map[string]
 	return nil
 }
 
-func selectInput(page playwright.Page, step config.Step, vars Vars, result map[string]any) error {
+func selectInput(page playwright.Page, step config.Step, vars utils.Vars, result map[string]any) error {
 	selector := step["select"].(string)
-	selector, err := execTemplate(selector, vars, page)
+	selector, err := utils.EvaluateTemplate(selector, vars, page)
 	if err != nil {
 		return err
 	}
@@ -91,7 +91,7 @@ func selectInput(page playwright.Page, step config.Step, vars Vars, result map[s
 	} else if step["value"] != nil {
 		value = step["value"].(string)
 	}
-	value, err = execTemplate(value, vars, page)
+	value, err = utils.EvaluateTemplate(value, vars, page)
 	if err != nil {
 		return err
 	}
@@ -104,9 +104,9 @@ func selectInput(page playwright.Page, step config.Step, vars Vars, result map[s
 	return nil
 }
 
-func fillInput(page playwright.Page, step config.Step, vars Vars, result map[string]any) error {
+func fillInput(page playwright.Page, step config.Step, vars utils.Vars, result map[string]any) error {
 	selector := step["fill"].(string)
-	selector, err := execTemplate(selector, vars, page)
+	selector, err := utils.EvaluateTemplate(selector, vars, page)
 	if err != nil {
 		return err
 	}
@@ -120,26 +120,26 @@ func fillInput(page playwright.Page, step config.Step, vars Vars, result map[str
 	} else if step["value"] != nil {
 		value = step["value"].(string)
 	}
-	value, err = execTemplate(value, vars, page)
+	value, err = utils.EvaluateTemplate(value, vars, page)
 	if err != nil {
 		return err
 	}
 	return page.Locator(selector).Fill(value)
 }
 
-func click(page playwright.Page, step config.Step, vars Vars, result map[string]any) error {
+func click(page playwright.Page, step config.Step, vars utils.Vars, result map[string]any) error {
 	selector := step["click"].(string)
-	selector, err := execTemplate(selector, vars, page)
+	selector, err := utils.EvaluateTemplate(selector, vars, page)
 	if err != nil {
 		return err
 	}
 	return page.Locator(selector).Click()
 }
 
-func executeJs(page playwright.Page, step config.Step, vars Vars, result map[string]any) error {
+func executeJs(page playwright.Page, step config.Step, vars utils.Vars, result map[string]any) error {
 	script := step["exec"].(string)
 
-	script, err := execTemplate(script, vars, page)
+	script, err := utils.EvaluateTemplate(script, vars, page)
 	if err != nil {
 		return err
 	}
@@ -150,13 +150,13 @@ func executeJs(page playwright.Page, step config.Step, vars Vars, result map[str
 	return setVar(step, value, vars, result)
 }
 
-func gotoPage(page playwright.Page, step config.Step, vars Vars, result map[string]any) error {
+func gotoPage(page playwright.Page, step config.Step, vars utils.Vars, result map[string]any) error {
 	url := step["goto"].(string)
 	_, err := page.Goto(url)
 	return err
 }
 
-func elementSelector(page playwright.Page, step config.Step, vars Vars, result map[string]any) error {
+func elementSelector(page playwright.Page, step config.Step, vars utils.Vars, result map[string]any) error {
 	selector := step["element"].(string)
 	locator := page.Locator(selector)
 	slog.Warn("element", slog.AnyValue(locator))
@@ -180,7 +180,7 @@ func elementSelector(page playwright.Page, step config.Step, vars Vars, result m
 	return setVar(step, value, vars, result)
 }
 
-func table(page playwright.Page, step config.Step, vars Vars, result map[string]any) error {
+func table(page playwright.Page, step config.Step, vars utils.Vars, result map[string]any) error {
 	selector := step["table"].(string)
 	locator := page.Locator(selector)
 
@@ -195,7 +195,7 @@ func table(page playwright.Page, step config.Step, vars Vars, result map[string]
 	return setVar(step, table, vars, result)
 }
 
-func setVar(step config.Step, value interface{}, vars Vars, result map[string]any) error {
+func setVar(step config.Step, value interface{}, vars utils.Vars, result map[string]any) error {
 	if setVar, ok := step["set-var"].(string); ok {
 		parseMode, setVarIsSet := step["parse-mode"].(string)
 		if !setVarIsSet {
@@ -227,12 +227,12 @@ func setVar(step config.Step, value interface{}, vars Vars, result map[string]an
 	return nil
 }
 
-func nop(p playwright.Page, s config.Step, v Vars, r map[string]any) error { return nil }
+func nop(p playwright.Page, s config.Step, v utils.Vars, r map[string]any) error { return nil }
 
-func screenshot(page playwright.Page, step config.Step, vars Vars, result map[string]any) error {
+func screenshot(page playwright.Page, step config.Step, vars utils.Vars, result map[string]any) error {
 	selector := step["screenshot"].(string)
 
-	lso, err := readParams[playwright.LocatorScreenshotOptions](step)
+	lso, err := LoadParams[playwright.LocatorScreenshotOptions](step)
 	if err != nil {
 		return err
 	}
@@ -248,7 +248,7 @@ func screenshot(page playwright.Page, step config.Step, vars Vars, result map[st
 	return err
 }
 
-func readParams[T any](step config.Step) (*T, error) {
+func LoadParams[T any](step config.Step) (*T, error) {
 	params, _ := step["params"].(map[string]any)
 	if params == nil {
 		params = make(map[string]any)
