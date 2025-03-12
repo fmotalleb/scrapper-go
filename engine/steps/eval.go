@@ -9,6 +9,16 @@ import (
 	"github.com/playwright-community/playwright-go"
 )
 
+func init() {
+	StepSelectors = append(StepSelectors, StepSelector{
+		CanHandle: func(s config.Step) bool {
+			_, ok := s["eval"].(string)
+			return ok
+		},
+		Generator: BuildEval,
+	})
+}
+
 type Eval struct {
 	locator string
 	JsCode  string

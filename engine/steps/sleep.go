@@ -10,6 +10,16 @@ import (
 	"github.com/playwright-community/playwright-go"
 )
 
+func init() {
+	StepSelectors = append(StepSelectors, StepSelector{
+		CanHandle: func(s config.Step) bool {
+			_, ok := s["sleep"].(string)
+			return ok
+		},
+		Generator: BuildSleep,
+	})
+}
+
 type Sleep struct {
 	sleep string
 }

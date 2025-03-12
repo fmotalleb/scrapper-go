@@ -21,12 +21,12 @@ var executors = map[string]executionEngine{
 	// "select":  selectInput,
 	// "fill":    fillInput,
 	// "click":   click,
-	"exec":    executeJs,
-	"print":   elementSelector,
-	"element": elementSelector,
-	"table":   table,
+	// "exec":    executeJs,
+	// "print":   elementSelector,
+	// "element": elementSelector,
+	// "table":   table,
 	// "goto":       gotoPage,
-	"screenshot": screenshot,
+	// "screenshot": screenshot,
 }
 
 func executeStep(page playwright.Page, step config.Step, vars utils.Vars, result map[string]any) error {

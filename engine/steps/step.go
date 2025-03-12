@@ -6,6 +6,13 @@ import (
 	"github.com/playwright-community/playwright-go"
 )
 
+var StepSelectors []StepSelector
+
+type StepSelector struct {
+	CanHandle func(config.Step) bool
+	Generator StepGenerator
+}
+
 type StepGenerator func(config.Step) (Step, error)
 
 type Step interface {

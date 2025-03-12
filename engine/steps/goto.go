@@ -8,6 +8,16 @@ import (
 	"github.com/playwright-community/playwright-go"
 )
 
+func init() {
+	StepSelectors = append(StepSelectors, StepSelector{
+		CanHandle: func(s config.Step) bool {
+			_, ok := s["goto"].(string)
+			return ok
+		},
+		Generator: BuildGoto,
+	})
+}
+
 type Goto struct {
 	url    string
 	params playwright.PageGotoOptions
@@ -22,7 +32,7 @@ func (g *Goto) Execute(p playwright.Page, vars utils.Vars, result map[string]any
 	}
 }
 
-func BuildGotoStep(step config.Step) (Step, error) {
+func BuildGoto(step config.Step) (Step, error) {
 	r := new(Goto)
 	r.params = playwright.PageGotoOptions{}
 	var ok bool

@@ -12,39 +12,38 @@ import (
 func init() {
 	StepSelectors = append(StepSelectors, StepSelector{
 		CanHandle: func(s config.Step) bool {
-			_, ok := s["fill"].(string)
+			_, ok := s["screenshot"].(string)
 			return ok
 		},
-		Generator: BuildClick,
+		Generator: BuildScreenShot,
 	})
 }
 
-type Click struct {
+type ScreenShot struct {
 	locator string
-	params  playwright.LocatorClickOptions
+	params  playwright.LocatorScreenshotOptions
 }
 
 // Execute implements Step.
-func (c *Click) Execute(page playwright.Page, vars utils.Vars, result map[string]any) (interface{}, error) {
-	locator, err := utils.EvaluateTemplate(c.locator, vars, page)
+func (sc *ScreenShot) Execute(page playwright.Page, vars utils.Vars, result map[string]any) (interface{}, error) {
+	locator, err := utils.EvaluateTemplate(sc.locator, vars, page)
 	if err != nil {
 		return nil, err
 	}
-
-	return nil, page.Locator(locator).Click(c.params)
+	_, err = page.Locator(locator).Screenshot(sc.params)
+	return nil, err
 }
 
-func IsClick()
-func BuildClick(step config.Step) (Step, error) {
-	r := new(Click)
-	if locator, ok := step["fill"].(string); ok {
+func BuildScreenShot(step config.Step) (Step, error) {
+	r := new(ScreenShot)
+	if locator, ok := step["screenshot"].(string); ok {
 		r.locator = locator
 	} else {
 		return nil, fmt.Errorf("fill must have a string input got: %v", step)
 	}
 
-	r.params = playwright.LocatorClickOptions{}
-	if params, err := utils.LoadParams[playwright.LocatorClickOptions](step); err != nil {
+	r.params = playwright.LocatorScreenshotOptions{}
+	if params, err := utils.LoadParams[playwright.LocatorScreenshotOptions](step); err != nil {
 		slog.Error("failed to read params", slog.Any("err", err), slog.Any("step", step))
 		return nil, err
 	} else {

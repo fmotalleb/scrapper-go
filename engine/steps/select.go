@@ -10,6 +10,16 @@ import (
 	"github.com/playwright-community/playwright-go"
 )
 
+func init() {
+	StepSelectors = append(StepSelectors, StepSelector{
+		CanHandle: func(s config.Step) bool {
+			_, ok := s["select"].(string)
+			return ok
+		},
+		Generator: BuildSelect,
+	})
+}
+
 type Select struct {
 	locator string
 
