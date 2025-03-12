@@ -10,7 +10,7 @@ import (
 )
 
 func init() {
-	StepSelectors = append(StepSelectors, StepSelector{
+	stepSelectors = append(stepSelectors, stepSelector{
 		CanHandle: func(s config.Step) bool {
 			_, ok := s["screenshot"].(string)
 			return ok
@@ -22,6 +22,11 @@ func init() {
 type ScreenShot struct {
 	locator string
 	params  playwright.LocatorScreenshotOptions
+	conf    config.Step
+}
+
+func (s *ScreenShot) GetConfig() config.Step {
+	return s.conf
 }
 
 // Execute implements Step.
@@ -36,6 +41,7 @@ func (sc *ScreenShot) Execute(page playwright.Page, vars utils.Vars, result map[
 
 func BuildScreenShot(step config.Step) (Step, error) {
 	r := new(ScreenShot)
+	r.conf = step
 	if locator, ok := step["screenshot"].(string); ok {
 		r.locator = locator
 	} else {

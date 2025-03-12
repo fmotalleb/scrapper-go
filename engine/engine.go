@@ -7,6 +7,8 @@ import (
 	"time"
 
 	"github.com/fmotalleb/scrapper-go/config"
+	"github.com/fmotalleb/scrapper-go/engine/middlewares"
+	"github.com/fmotalleb/scrapper-go/engine/steps"
 	"github.com/playwright-community/playwright-go"
 )
 
@@ -68,18 +70,14 @@ func ExecuteConfig(config config.ExecutionConfig) (map[string]any, error) {
 		slog.Error("could not create page", slog.Any("err", err))
 		return nil, fmt.Errorf("could not create page: %v", err)
 	}
-
-	for _, step := range config.Pipeline.Steps {
-		slog.Debug("Executing step", slog.Any("step", step))
-		if err := executeStep(page, step, vars, result); err != nil {
-			slog.Error("error executing step", slog.Any("err", err), slog.Any("step", step))
-			switch step["on-error"] {
-			case "ignore":
-				slog.Warn("ignoring error", slog.Any("err", err))
-			default:
-				return result, fmt.Errorf("error executing step: %v, step: %v", err, step)
-			}
-
+	// steps.StepSelectors
+	steps, err := steps.BuildSteps(config.Pipeline.Steps)
+	if err != nil {
+		return nil, err
+	}
+	for _, step := range steps {
+		if err = middlewares.StartExecution(page, step, vars, result); err != nil {
+			return nil, err
 		}
 	}
 

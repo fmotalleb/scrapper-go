@@ -9,7 +9,7 @@ import (
 )
 
 func init() {
-	StepSelectors = append(StepSelectors, StepSelector{
+	stepSelectors = append(stepSelectors, stepSelector{
 		CanHandle: func(s config.Step) bool {
 			_, ok := s["goto"].(string)
 			return ok
@@ -21,6 +21,11 @@ func init() {
 type Goto struct {
 	url    string
 	params playwright.PageGotoOptions
+	conf   config.Step
+}
+
+func (s *Goto) GetConfig() config.Step {
+	return s.conf
 }
 
 // Execute implements Step.
@@ -34,6 +39,7 @@ func (g *Goto) Execute(p playwright.Page, vars utils.Vars, result map[string]any
 
 func BuildGoto(step config.Step) (Step, error) {
 	r := new(Goto)
+	r.conf = step
 	r.params = playwright.PageGotoOptions{}
 	var ok bool
 	if r.url, ok = step["goto"].(string); !ok {

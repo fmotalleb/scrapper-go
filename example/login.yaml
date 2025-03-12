@@ -10,5 +10,6 @@ pipeline:
     - goto: https://tools.admin.dornicafile.ir/test.html
     - if: |
         "{{ "156" | eval }}" is 156
-      table: table
-      set-var: table
+      element: table
+      mode: table
+      set-var: result

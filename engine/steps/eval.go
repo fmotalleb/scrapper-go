@@ -10,7 +10,7 @@ import (
 )
 
 func init() {
-	StepSelectors = append(StepSelectors, StepSelector{
+	stepSelectors = append(stepSelectors, stepSelector{
 		CanHandle: func(s config.Step) bool {
 			_, ok := s["eval"].(string)
 			return ok
@@ -23,6 +23,11 @@ type Eval struct {
 	locator string
 	JsCode  string
 	params  playwright.LocatorEvaluateOptions
+	conf    config.Step
+}
+
+func (s *Eval) GetConfig() config.Step {
+	return s.conf
 }
 
 // Execute implements Step.
@@ -46,6 +51,7 @@ func (e *Eval) Execute(page playwright.Page, vars utils.Vars, result map[string]
 
 func BuildEval(step config.Step) (Step, error) {
 	r := new(Eval)
+	r.conf = step
 	if locator, ok := step["locator"].(string); ok {
 		r.locator = locator
 	} else {

@@ -13,7 +13,7 @@ import (
 type GetTextMode string
 
 func init() {
-	StepSelectors = append(StepSelectors, StepSelector{
+	stepSelectors = append(stepSelectors, stepSelector{
 		CanHandle: func(s config.Step) bool {
 			_, ok := s["element"].(string)
 			return ok
@@ -40,6 +40,11 @@ type GetText struct {
 	locator string
 	mode    GetTextMode
 	params  playwright.LocatorEvaluateOptions
+	conf    config.Step
+}
+
+func (s *GetText) GetConfig() config.Step {
+	return s.conf
 }
 
 // Execute implements Step.
@@ -63,7 +68,7 @@ func (g *GetText) Execute(page playwright.Page, vars utils.Vars, result map[stri
 	case GET_TABLE:
 		var body string
 		body, err = element.InnerHTML()
-		if err != nil {
+		if err == nil {
 			r, err = utils.ParseTable(fmt.Sprintf("<table>%s</table>", body))
 		}
 	}
@@ -72,12 +77,14 @@ func (g *GetText) Execute(page playwright.Page, vars utils.Vars, result map[stri
 
 func BuildElementSelector(step config.Step) (Step, error) {
 	r := new(GetText)
+	r.conf = step
 	if locator, ok := step["element"].(string); ok {
 		r.locator = locator
 	} else {
 		r.locator = ""
 	}
 	if mode, ok := step["mode"].(string); ok && mode != "" {
+		slog.Debug("selected mode", slog.String("mode", mode))
 		if mode, ok := validModes[mode]; ok {
 			r.mode = mode
 		} else {

@@ -11,7 +11,7 @@ import (
 )
 
 func init() {
-	StepSelectors = append(StepSelectors, StepSelector{
+	stepSelectors = append(stepSelectors, stepSelector{
 		CanHandle: func(s config.Step) bool {
 			_, ok := s["sleep"].(string)
 			return ok
@@ -22,6 +22,11 @@ func init() {
 
 type Sleep struct {
 	sleep string
+	conf  config.Step
+}
+
+func (s *Sleep) GetConfig() config.Step {
+	return s.conf
 }
 
 // Execute implements Step.
@@ -41,6 +46,7 @@ func (s *Sleep) Execute(page playwright.Page, vars utils.Vars, result map[string
 
 func BuildSleep(step config.Step) (Step, error) {
 	r := new(Sleep)
+	r.conf = step
 	if sleep, ok := step["sleep"].(string); ok {
 		r.sleep = sleep
 	} else {

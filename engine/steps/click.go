@@ -10,7 +10,7 @@ import (
 )
 
 func init() {
-	StepSelectors = append(StepSelectors, StepSelector{
+	stepSelectors = append(stepSelectors, stepSelector{
 		CanHandle: func(s config.Step) bool {
 			_, ok := s["fill"].(string)
 			return ok
@@ -22,6 +22,11 @@ func init() {
 type Click struct {
 	locator string
 	params  playwright.LocatorClickOptions
+	conf    config.Step
+}
+
+func (s *Click) GetConfig() config.Step {
+	return s.conf
 }
 
 // Execute implements Step.
@@ -34,9 +39,9 @@ func (c *Click) Execute(page playwright.Page, vars utils.Vars, result map[string
 	return nil, page.Locator(locator).Click(c.params)
 }
 
-func IsClick()
 func BuildClick(step config.Step) (Step, error) {
 	r := new(Click)
+	r.conf = step
 	if locator, ok := step["fill"].(string); ok {
 		r.locator = locator
 	} else {

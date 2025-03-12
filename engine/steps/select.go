@@ -11,7 +11,7 @@ import (
 )
 
 func init() {
-	StepSelectors = append(StepSelectors, StepSelector{
+	stepSelectors = append(stepSelectors, stepSelector{
 		CanHandle: func(s config.Step) bool {
 			_, ok := s["select"].(string)
 			return ok
@@ -29,6 +29,11 @@ type Select struct {
 	Labels         []string
 
 	params playwright.LocatorSelectOptionOptions
+	conf   config.Step
+}
+
+func (s *Select) GetConfig() config.Step {
+	return s.conf
 }
 
 // Execute implements Step.
@@ -76,6 +81,7 @@ func (s *Select) Execute(page playwright.Page, vars utils.Vars, result map[strin
 
 func BuildSelect(step config.Step) (Step, error) {
 	r := new(Select)
+	r.conf = step
 	if locator, ok := step["select"].(string); ok {
 		r.locator = locator
 	} else {

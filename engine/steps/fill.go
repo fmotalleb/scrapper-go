@@ -10,7 +10,7 @@ import (
 )
 
 func init() {
-	StepSelectors = append(StepSelectors, StepSelector{
+	stepSelectors = append(stepSelectors, stepSelector{
 		CanHandle: func(s config.Step) bool {
 			_, ok := s["fill"].(string)
 			return ok
@@ -23,6 +23,11 @@ type Fill struct {
 	locator string
 	Value   string
 	params  playwright.LocatorFillOptions
+	conf    config.Step
+}
+
+func (s *Fill) GetConfig() config.Step {
+	return s.conf
 }
 
 // Execute implements Step.
@@ -40,6 +45,7 @@ func (f *Fill) Execute(page playwright.Page, vars utils.Vars, result map[string]
 
 func BuildFill(step config.Step) (Step, error) {
 	r := new(Fill)
+	r.conf = step
 	if locator, ok := step["fill"].(string); ok {
 		r.locator = locator
 	} else {
