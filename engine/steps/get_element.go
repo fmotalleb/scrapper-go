@@ -1,7 +1,6 @@
 package steps
 
 import (
-	"errors"
 	"fmt"
 	"log/slog"
 
@@ -53,10 +52,13 @@ func (s *getText) GetConfig() config.Step {
 func (g *getText) Execute(page playwright.Page, vars utils.Vars, result map[string]any) (interface{}, error) {
 	locator, err := utils.EvaluateTemplate(g.locator, vars, page)
 	if err != nil {
+		slog.Error("failed to evaluate locator template", slog.String("locator", g.locator), slog.Any("error", err))
 		return nil, err
 	}
 	element := page.Locator(locator)
 	var output interface{}
+
+	slog.Debug("fetching element content", slog.String("locator", locator), slog.String("mode", string(g.mode)))
 
 	switch g.mode {
 	case GET_HTML:
@@ -74,6 +76,7 @@ func (g *getText) Execute(page playwright.Page, vars utils.Vars, result map[stri
 		if err == nil {
 			output, err = utils.ParseTable(fmt.Sprintf("<table>%s</table>", body))
 		}
+
 	case GET_TABLE_FLAT:
 		var body string
 		body, err = element.InnerHTML()
@@ -82,35 +85,45 @@ func (g *getText) Execute(page playwright.Page, vars utils.Vars, result map[stri
 		}
 	}
 
+	if err != nil {
+		slog.Error("failed to fetch content from element", slog.String("locator", locator), slog.String("mode", string(g.mode)), slog.Any("error", err))
+	}
 	return output, err
 }
 
 func buildElementSelector(step config.Step) (Step, error) {
 	r := new(getText)
 	r.conf = step
+
+	// Extract locator
 	if locator, ok := step["element"].(string); ok {
 		r.locator = locator
 	} else {
-		r.locator = ""
-	}
-	if mode, ok := step["mode"].(string); ok && mode != "" {
-		slog.Debug("selected mode", slog.String("mode", mode))
-		if mode, ok := validModes[mode]; ok {
-			r.mode = mode
-		} else {
-			slog.Error("cannot parse mode", slog.Any("step", step), slog.Any("valid-modes", validModes))
-			return nil, errors.New("selected mode is not in valid modes")
-		}
-	} else {
-		r.mode = GET_HTML
+		return nil, fmt.Errorf("expected 'element' to be a string, got: %T", step["element"])
 	}
 
+	// Extract and validate mode
+	if mode, ok := step["mode"].(string); ok && mode != "" {
+		slog.Debug("selected mode", slog.String("mode", mode))
+		if validMode, exists := validModes[mode]; exists {
+			r.mode = validMode
+		} else {
+			err := fmt.Errorf("invalid mode '%s' selected, valid modes are: %v", mode, validModes)
+			slog.Error("invalid mode", slog.String("mode", mode), slog.Any("valid-modes", validModes))
+			return nil, err
+		}
+	} else {
+		r.mode = GET_HTML // Default mode if not provided
+	}
+
+	// Load optional parameters
 	r.params = playwright.LocatorEvaluateOptions{}
 	if params, err := utils.LoadParams[playwright.LocatorEvaluateOptions](step); err != nil {
-		slog.Error("failed to read params", slog.Any("err", err), slog.Any("step", step))
+		slog.Error("failed to read params", slog.Any("error", err), slog.Any("step", step))
 		return nil, err
 	} else {
 		r.params = *params
 	}
+
 	return r, nil
 }

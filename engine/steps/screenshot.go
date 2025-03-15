@@ -1,6 +1,7 @@
 package steps
 
 import (
+	"encoding/base64"
 	"fmt"
 	"log/slog"
 
@@ -31,29 +32,50 @@ func (s *screenShot) GetConfig() config.Step {
 
 // Execute implements Step.
 func (sc *screenShot) Execute(page playwright.Page, vars utils.Vars, result map[string]any) (interface{}, error) {
+	// Evaluate the locator template
 	locator, err := utils.EvaluateTemplate(sc.locator, vars, page)
 	if err != nil {
+		slog.Error("failed to evaluate locator template", slog.String("locator", sc.locator), slog.Any("error", err))
 		return nil, err
 	}
-	_, err = page.Locator(locator).Screenshot(sc.params)
-	return nil, err
+
+	// Check if the locator is empty
+	if locator == "" {
+		err := fmt.Errorf("evaluated locator is empty")
+		slog.Error("empty locator in screenshot step", slog.String("locator", locator))
+		return nil, err
+	}
+
+	// Take a screenshot of the element identified by the locator
+	slog.Debug("taking screenshot for locator", slog.String("locator", locator))
+	data, err := page.Locator(locator).Screenshot(sc.params)
+	if err != nil {
+		slog.Error("failed to take screenshot", slog.Any("error", err))
+		return nil, err
+	}
+	b64 := base64.StdEncoding.EncodeToString(data)
+	return b64, nil
 }
 
 func buildScreenShot(step config.Step) (Step, error) {
 	r := new(screenShot)
 	r.conf = step
+
+	// Extract the locator for the screenshot step
 	if locator, ok := step["screenshot"].(string); ok {
 		r.locator = locator
 	} else {
-		return nil, fmt.Errorf("screenshot must have a string input got: %v", step)
+		return nil, fmt.Errorf("screenshot must have a string input, got: %v", step)
 	}
 
+	// Load additional parameters for the screenshot
 	r.params = playwright.LocatorScreenshotOptions{}
 	if params, err := utils.LoadParams[playwright.LocatorScreenshotOptions](step); err != nil {
-		slog.Error("failed to read params", slog.Any("err", err), slog.Any("step", step))
+		slog.Error("failed to read screenshot params", slog.Any("error", err), slog.Any("step", step))
 		return nil, err
 	} else {
 		r.params = *params
 	}
+
 	return r, nil
 }

@@ -2,6 +2,7 @@ package steps
 
 import (
 	"fmt"
+	"log/slog"
 
 	"github.com/fmotalleb/scrapper-go/config"
 	"github.com/fmotalleb/scrapper-go/utils"
@@ -11,15 +12,24 @@ import (
 func BuildSteps(steps []config.Step) ([]Step, error) {
 	output := make([]Step, len(steps))
 	var err error
+
 	for index, step := range steps {
+		var handled bool
 		for _, selector := range stepSelectors {
 			if selector.CanHandle(step) {
+				// Log the selector being applied
+				slog.Debug("applying selector", slog.Any("step", step), slog.Any("selector", selector))
 				if output[index], err = selector.Generator(step); err != nil {
-					return nil, err
+					return nil, fmt.Errorf("error generating step: %w", err)
 				}
+				handled = true
+				break
 			}
 		}
-		if output[index] == nil {
+
+		// Log failure if no selector could handle the step
+		if !handled {
+			slog.Error("failed to handle step", slog.Any("step", step))
 			return nil, fmt.Errorf("failed to handle step: %v", step)
 		}
 	}

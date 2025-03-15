@@ -8,7 +8,5 @@ pipeline:
     - element: table
       mode: table
       set-var: result
-    - click: table225
-      params:
-        timeout: 1000
-      on-error: print
+    - screenshot: body
+      set-var: scr
