@@ -12,7 +12,7 @@ import (
 func init() {
 	stepSelectors = append(stepSelectors, stepSelector{
 		CanHandle: func(s config.Step) bool {
-			_, ok := s["fill"].(string)
+			_, ok := s["click"].(string)
 			return ok
 		},
 		Generator: BuildClick,
@@ -42,10 +42,10 @@ func (c *Click) Execute(page playwright.Page, vars utils.Vars, result map[string
 func BuildClick(step config.Step) (Step, error) {
 	r := new(Click)
 	r.conf = step
-	if locator, ok := step["fill"].(string); ok {
+	if locator, ok := step["click"].(string); ok {
 		r.locator = locator
 	} else {
-		return nil, fmt.Errorf("fill must have a string input got: %v", step)
+		return nil, fmt.Errorf("click must have a string input got: %v", step)
 	}
 
 	r.params = playwright.LocatorClickOptions{}

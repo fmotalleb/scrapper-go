@@ -18,13 +18,11 @@ var (
 )
 
 func init() {
-	registerMiddleware(new(_if))
+	registerMiddleware(conditionCheck)
 }
 
-type _if struct{}
-
 // exec implements Middleware.
-func (i _if) exec(p playwright.Page, s steps.Step, v utils.Vars, _ map[string]any) error {
+func conditionCheck(p playwright.Page, s steps.Step, v utils.Vars, r map[string]any, next execFunc) error {
 	if s == nil {
 		return step_missing_fatal
 	}
@@ -47,11 +45,11 @@ func (i _if) exec(p playwright.Page, s steps.Step, v utils.Vars, _ map[string]an
 	switch err {
 	case nil:
 		if exec.(bool) {
-			return nil
+			return next(p, s, v, r)
 		}
 		return test_failed
 	case no_if:
-		return nil
+		return next(p, s, v, r)
 	default:
 		return err
 	}

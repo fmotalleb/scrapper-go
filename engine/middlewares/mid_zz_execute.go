@@ -9,13 +9,14 @@ import (
 )
 
 func init() {
-	registerMiddleware(new(execute))
+	registerMiddleware(exec)
 }
 
-type execute struct{}
-
 // exec implements Middleware.
-func (e *execute) exec(p playwright.Page, s steps.Step, v utils.Vars, r map[string]any) error {
+func exec(p playwright.Page, s steps.Step, v utils.Vars, r map[string]any, next execFunc) error {
+	if next != nil {
+		return fmt.Errorf("found next middleware where its impossible to have one, no middleware are allowed after execute middleware")
+	}
 	result, err := s.Execute(p, v, r)
 	if err != nil {
 		return err

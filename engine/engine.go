@@ -75,8 +75,9 @@ func ExecuteConfig(config config.ExecutionConfig) (map[string]any, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	for _, step := range steps {
-		if err = middlewares.StartExecution(page, step, vars, result); err != nil {
+		if err = middlewares.HandleStep(page, step, vars, result); err != nil {
 			return nil, err
 		}
 	}
