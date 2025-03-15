@@ -5,6 +5,8 @@ package cmd
 
 import (
 	"fmt"
+	"log/slog"
+	"os"
 
 	"github.com/fmotalleb/scrapper-go/server"
 	"github.com/spf13/cobra"
@@ -20,7 +22,10 @@ var serveCmd = &cobra.Command{
 	Use:   "serve",
 	Short: "Serve service as an api endpoint",
 	Run: func(cmd *cobra.Command, args []string) {
-		server.StartServer(fmt.Sprintf("%s:%d", address, port))
+		if err := server.StartServer(fmt.Sprintf("%s:%d", address, port)); err != nil {
+			slog.Error("error starting server", slog.Any("err", err))
+			os.Exit(1)
+		}
 	},
 }
 
