@@ -11,8 +11,19 @@
       "mode": "auto",
       "program": "${workspaceFolder}",
       "args": [
-        "--config=/home/motalleb/.config/scrapper/login.yaml",
+        "--config=example/aprys.yaml",
         "--format=yaml",
+        "--log-level=DEBUG",
+      ]
+    },
+    {
+      "name": "Serve Server",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "program": "${workspaceFolder}",
+      "args": [
+        "serve",
         "--log-level=DEBUG",
       ]
     }
