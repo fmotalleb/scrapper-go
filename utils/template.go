@@ -31,18 +31,20 @@ func TemplateEvalMapper(vars Vars, page playwright.Page) func(string) (string, e
 
 func EvaluateTemplate(text string, vars Vars, page playwright.Page) (string, error) {
 	templateObj := template.New("template")
-	templateObj = templateObj.Funcs(map[string]any{
-		"eval": page.Evaluate,
-	})
+
+	variables := vars.LiveSnapshot()
+	if _, ok := variables["eval"]; ok {
+		slog.Error("found a page variable in live snapshot generated for template, renaming old page variable to _page")
+		variables = unShadow(variables, "eval")
+	}
+	variables["eval"] = page.Evaluate
+	templateObj = templateObj.Funcs(variables)
+
 	templateObj, err := templateObj.Parse(text)
 	if err != nil {
 		return "", fmt.Errorf("failed to parse template: %s", err)
 	}
-	variables := vars.LiveSnapshot()
-	if _, ok := variables["page"]; ok {
-		slog.Error("found a page variable in live snapshot generated for template, renaming old page variable to _page")
-		variables = unShadow(variables, "page")
-	}
+
 	variables["page"] = page
 	output := bytes.NewBufferString("")
 	err = templateObj.Execute(output, variables)

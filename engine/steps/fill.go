@@ -55,7 +55,7 @@ func buildFill(step config.Step) (Step, error) {
 	if value, ok := step["value"].(string); ok {
 		r.value = value
 	} else {
-		return nil, fmt.Errorf("fill must have a string input got: %v", step)
+		return nil, fmt.Errorf("fill must have a string value got: %v", step)
 	}
 
 	r.params = playwright.LocatorFillOptions{}

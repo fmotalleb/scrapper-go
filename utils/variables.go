@@ -34,11 +34,7 @@ func (v Vars) Snapshot() map[string]string {
 func (v Vars) LiveSnapshot() map[string]any {
 	snap := make(map[string]any)
 	for k, g := range v {
-		if g.isGenerative {
-			snap[k] = g.get
-		} else {
-			snap[k] = g.value
-		}
+		snap[k] = g.getValue
 	}
 	return snap
 }
