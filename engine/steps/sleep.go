@@ -31,15 +31,23 @@ func (s *sleep) GetConfig() config.Step {
 
 // Execute implements Step.
 func (s *sleep) Execute(page playwright.Page, vars utils.Vars, result map[string]any) (interface{}, error) {
+	// Evaluate the sleep duration template
 	waitTime, err := utils.EvaluateTemplate(s.sleep, vars, page)
 	if err != nil {
 		return nil, err
 	}
+
+	// Parse the evaluated string to duration
 	value, err := time.ParseDuration(waitTime)
 	if err != nil {
-		slog.Error("was not able to parse given duration from string", slog.Any("err", err))
+		slog.Error("failed to parse the sleep duration", slog.String("input", waitTime), slog.Any("err", err))
 		return nil, err
 	}
+
+	// Log the sleep duration for confirmation
+	slog.Info("sleeping for duration", slog.String("duration", value.String()))
+
+	// Sleep for the evaluated duration
 	time.Sleep(value)
 	return nil, nil
 }
@@ -47,10 +55,13 @@ func (s *sleep) Execute(page playwright.Page, vars utils.Vars, result map[string
 func buildSleep(step config.Step) (Step, error) {
 	r := new(sleep)
 	r.conf = step
+
+	// Retrieve the sleep duration string from the config step
 	if sleep, ok := step["sleep"].(string); ok {
 		r.sleep = sleep
 	} else {
-		return nil, fmt.Errorf("sleep must have a string input got: %v", step)
+		return nil, fmt.Errorf("sleep must have a string input, got: %v", step)
 	}
+
 	return r, nil
 }
