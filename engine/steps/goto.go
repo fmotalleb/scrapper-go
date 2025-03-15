@@ -14,22 +14,22 @@ func init() {
 			_, ok := s["goto"].(string)
 			return ok
 		},
-		Generator: BuildGoto,
+		Generator: buildGoto,
 	})
 }
 
-type Goto struct {
+type gotoStep struct {
 	url    string
 	params playwright.PageGotoOptions
 	conf   config.Step
 }
 
-func (s *Goto) GetConfig() config.Step {
+func (s *gotoStep) GetConfig() config.Step {
 	return s.conf
 }
 
 // Execute implements Step.
-func (g *Goto) Execute(p playwright.Page, vars utils.Vars, result map[string]any) (interface{}, error) {
+func (g *gotoStep) Execute(p playwright.Page, vars utils.Vars, result map[string]any) (interface{}, error) {
 	if url, err := utils.EvaluateTemplate(g.url, vars, p); err != nil {
 		return nil, err
 	} else {
@@ -37,8 +37,8 @@ func (g *Goto) Execute(p playwright.Page, vars utils.Vars, result map[string]any
 	}
 }
 
-func BuildGoto(step config.Step) (Step, error) {
-	r := new(Goto)
+func buildGoto(step config.Step) (Step, error) {
+	r := new(gotoStep)
 	r.conf = step
 	r.params = playwright.PageGotoOptions{}
 	var ok bool

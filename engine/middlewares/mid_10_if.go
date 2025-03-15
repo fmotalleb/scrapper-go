@@ -21,7 +21,7 @@ func init() {
 	registerMiddleware(conditionCheck)
 }
 
-// exec implements Middleware.
+// conditionCheck implements Middleware.
 func conditionCheck(p playwright.Page, s steps.Step, v utils.Vars, r map[string]any, next execFunc) error {
 	if s == nil {
 		return step_missing_fatal

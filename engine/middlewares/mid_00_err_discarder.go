@@ -12,7 +12,7 @@ func init() {
 	registerMiddleware(errorDiscard)
 }
 
-// exec implements Middleware.
+// errorDiscard implements Middleware.
 func errorDiscard(p playwright.Page, s steps.Step, v utils.Vars, r map[string]any, next execFunc) error {
 	err := next(p, s, v, r)
 	if errMode, ok := s.GetConfig()["on-error"].(string); ok {

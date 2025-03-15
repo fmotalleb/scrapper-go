@@ -16,21 +16,21 @@ func init() {
 			_, ok := s["sleep"].(string)
 			return ok
 		},
-		Generator: BuildSleep,
+		Generator: buildSleep,
 	})
 }
 
-type Sleep struct {
+type sleep struct {
 	sleep string
 	conf  config.Step
 }
 
-func (s *Sleep) GetConfig() config.Step {
+func (s *sleep) GetConfig() config.Step {
 	return s.conf
 }
 
 // Execute implements Step.
-func (s *Sleep) Execute(page playwright.Page, vars utils.Vars, result map[string]any) (interface{}, error) {
+func (s *sleep) Execute(page playwright.Page, vars utils.Vars, result map[string]any) (interface{}, error) {
 	waitTime, err := utils.EvaluateTemplate(s.sleep, vars, page)
 	if err != nil {
 		return nil, err
@@ -44,8 +44,8 @@ func (s *Sleep) Execute(page playwright.Page, vars utils.Vars, result map[string
 	return nil, nil
 }
 
-func BuildSleep(step config.Step) (Step, error) {
-	r := new(Sleep)
+func buildSleep(step config.Step) (Step, error) {
+	r := new(sleep)
 	r.conf = step
 	if sleep, ok := step["sleep"].(string); ok {
 		r.sleep = sleep

@@ -16,11 +16,11 @@ func init() {
 			_, ok := s["select"].(string)
 			return ok
 		},
-		Generator: BuildSelect,
+		Generator: buildSelect,
 	})
 }
 
-type Select struct {
+type selectStep struct {
 	locator string
 
 	vluesOrLabels []string
@@ -32,12 +32,12 @@ type Select struct {
 	conf   config.Step
 }
 
-func (s *Select) GetConfig() config.Step {
+func (s *selectStep) GetConfig() config.Step {
 	return s.conf
 }
 
 // Execute implements Step.
-func (s *Select) Execute(page playwright.Page, vars utils.Vars, result map[string]any) (interface{}, error) {
+func (s *selectStep) Execute(page playwright.Page, vars utils.Vars, result map[string]any) (interface{}, error) {
 	locator, err := utils.EvaluateTemplate(s.locator, vars, page)
 	if err != nil {
 		return nil, err
@@ -79,8 +79,8 @@ func (s *Select) Execute(page playwright.Page, vars utils.Vars, result map[strin
 	return page.Locator(locator).SelectOption(*selectOpt, s.params)
 }
 
-func BuildSelect(step config.Step) (Step, error) {
-	r := new(Select)
+func buildSelect(step config.Step) (Step, error) {
+	r := new(selectStep)
 	r.conf = step
 	if locator, ok := step["select"].(string); ok {
 		r.locator = locator

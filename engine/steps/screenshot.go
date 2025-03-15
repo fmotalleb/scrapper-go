@@ -15,22 +15,22 @@ func init() {
 			_, ok := s["screenshot"].(string)
 			return ok
 		},
-		Generator: BuildScreenShot,
+		Generator: buildScreenShot,
 	})
 }
 
-type ScreenShot struct {
+type screenShot struct {
 	locator string
 	params  playwright.LocatorScreenshotOptions
 	conf    config.Step
 }
 
-func (s *ScreenShot) GetConfig() config.Step {
+func (s *screenShot) GetConfig() config.Step {
 	return s.conf
 }
 
 // Execute implements Step.
-func (sc *ScreenShot) Execute(page playwright.Page, vars utils.Vars, result map[string]any) (interface{}, error) {
+func (sc *screenShot) Execute(page playwright.Page, vars utils.Vars, result map[string]any) (interface{}, error) {
 	locator, err := utils.EvaluateTemplate(sc.locator, vars, page)
 	if err != nil {
 		return nil, err
@@ -39,8 +39,8 @@ func (sc *ScreenShot) Execute(page playwright.Page, vars utils.Vars, result map[
 	return nil, err
 }
 
-func BuildScreenShot(step config.Step) (Step, error) {
-	r := new(ScreenShot)
+func buildScreenShot(step config.Step) (Step, error) {
+	r := new(screenShot)
 	r.conf = step
 	if locator, ok := step["screenshot"].(string); ok {
 		r.locator = locator

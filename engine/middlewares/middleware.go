@@ -17,7 +17,6 @@ type execFunc = func(p playwright.Page, s steps.Step, v utils.Vars, r map[string
 type middleware = func(playwright.Page, steps.Step, utils.Vars, map[string]any, execFunc) error
 
 func HandleStep(p playwright.Page, s steps.Step, v utils.Vars, r map[string]any) error {
-
 	return middlewareExec(0, p, s, v, r)
 }
 

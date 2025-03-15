@@ -15,23 +15,23 @@ func init() {
 			_, ok := s["eval"].(string)
 			return ok
 		},
-		Generator: BuildEval,
+		Generator: buildEval,
 	})
 }
 
-type Eval struct {
+type eval struct {
 	locator string
 	jsCode  string
 	params  playwright.LocatorEvaluateOptions
 	conf    config.Step
 }
 
-func (s *Eval) GetConfig() config.Step {
+func (s *eval) GetConfig() config.Step {
 	return s.conf
 }
 
 // Execute implements Step.
-func (e *Eval) Execute(page playwright.Page, vars utils.Vars, result map[string]any) (interface{}, error) {
+func (e *eval) Execute(page playwright.Page, vars utils.Vars, result map[string]any) (interface{}, error) {
 	locator, err := utils.EvaluateTemplate(e.locator, vars, page)
 	if err != nil {
 		return nil, err
@@ -49,8 +49,8 @@ func (e *Eval) Execute(page playwright.Page, vars utils.Vars, result map[string]
 	return r, err
 }
 
-func BuildEval(step config.Step) (Step, error) {
-	r := new(Eval)
+func buildEval(step config.Step) (Step, error) {
+	r := new(eval)
 	r.conf = step
 	if locator, ok := step["locator"].(string); ok {
 		r.locator = locator

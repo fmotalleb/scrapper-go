@@ -31,10 +31,10 @@ var stepSelectors []stepSelector
 
 type stepSelector struct {
 	CanHandle func(config.Step) bool
-	Generator StepGenerator
+	Generator stepGenerator
 }
 
-type StepGenerator func(config.Step) (Step, error)
+type stepGenerator func(config.Step) (Step, error)
 
 type Step interface {
 	Execute(playwright.Page, utils.Vars, map[string]any) (interface{}, error)

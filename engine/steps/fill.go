@@ -15,23 +15,23 @@ func init() {
 			_, ok := s["fill"].(string)
 			return ok
 		},
-		Generator: BuildFill,
+		Generator: buildFill,
 	})
 }
 
-type Fill struct {
+type fill struct {
 	locator string
 	value   string
 	params  playwright.LocatorFillOptions
 	conf    config.Step
 }
 
-func (s *Fill) GetConfig() config.Step {
+func (s *fill) GetConfig() config.Step {
 	return s.conf
 }
 
 // Execute implements Step.
-func (f *Fill) Execute(page playwright.Page, vars utils.Vars, result map[string]any) (interface{}, error) {
+func (f *fill) Execute(page playwright.Page, vars utils.Vars, result map[string]any) (interface{}, error) {
 	locator, err := utils.EvaluateTemplate(f.locator, vars, page)
 	if err != nil {
 		return nil, err
@@ -43,8 +43,8 @@ func (f *Fill) Execute(page playwright.Page, vars utils.Vars, result map[string]
 	return nil, page.Locator(locator).Fill(fill, f.params)
 }
 
-func BuildFill(step config.Step) (Step, error) {
-	r := new(Fill)
+func buildFill(step config.Step) (Step, error) {
+	r := new(fill)
 	r.conf = step
 	if locator, ok := step["fill"].(string); ok {
 		r.locator = locator

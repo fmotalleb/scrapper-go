@@ -10,7 +10,7 @@ import (
 	"github.com/playwright-community/playwright-go"
 )
 
-type GetTextMode string
+type getTextMode string
 
 func init() {
 	stepSelectors = append(stepSelectors, stepSelector{
@@ -18,37 +18,37 @@ func init() {
 			_, ok := s["element"].(string)
 			return ok
 		},
-		Generator: BuildElementSelector,
+		Generator: buildElementSelector,
 	})
 }
 
 const (
-	GET_HTML  = GetTextMode("html")
-	GET_VALUE = GetTextMode("value")
-	GET_TEXT  = GetTextMode("text")
-	GET_TABLE = GetTextMode("table")
+	GET_HTML  = getTextMode("html")
+	GET_VALUE = getTextMode("value")
+	GET_TEXT  = getTextMode("text")
+	GET_TABLE = getTextMode("table")
 )
 
-var validModes = map[string]GetTextMode{
+var validModes = map[string]getTextMode{
 	"html":  GET_HTML,
 	"value": GET_VALUE,
 	"text":  GET_TEXT,
 	"table": GET_TABLE,
 }
 
-type GetText struct {
+type getText struct {
 	locator string
-	mode    GetTextMode
+	mode    getTextMode
 	params  playwright.LocatorEvaluateOptions
 	conf    config.Step
 }
 
-func (s *GetText) GetConfig() config.Step {
+func (s *getText) GetConfig() config.Step {
 	return s.conf
 }
 
 // Execute implements Step.
-func (g *GetText) Execute(page playwright.Page, vars utils.Vars, result map[string]any) (interface{}, error) {
+func (g *getText) Execute(page playwright.Page, vars utils.Vars, result map[string]any) (interface{}, error) {
 	locator, err := utils.EvaluateTemplate(g.locator, vars, page)
 	if err != nil {
 		return nil, err
@@ -75,8 +75,8 @@ func (g *GetText) Execute(page playwright.Page, vars utils.Vars, result map[stri
 	return r, err
 }
 
-func BuildElementSelector(step config.Step) (Step, error) {
-	r := new(GetText)
+func buildElementSelector(step config.Step) (Step, error) {
+	r := new(getText)
 	r.conf = step
 	if locator, ok := step["element"].(string); ok {
 		r.locator = locator

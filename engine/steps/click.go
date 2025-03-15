@@ -15,22 +15,22 @@ func init() {
 			_, ok := s["click"].(string)
 			return ok
 		},
-		Generator: BuildClick,
+		Generator: buildClick,
 	})
 }
 
-type Click struct {
+type click struct {
 	locator string
 	params  playwright.LocatorClickOptions
 	conf    config.Step
 }
 
-func (s *Click) GetConfig() config.Step {
+func (s *click) GetConfig() config.Step {
 	return s.conf
 }
 
 // Execute implements Step.
-func (c *Click) Execute(page playwright.Page, vars utils.Vars, result map[string]any) (interface{}, error) {
+func (c *click) Execute(page playwright.Page, vars utils.Vars, result map[string]any) (interface{}, error) {
 	locator, err := utils.EvaluateTemplate(c.locator, vars, page)
 	if err != nil {
 		return nil, err
@@ -39,8 +39,8 @@ func (c *Click) Execute(page playwright.Page, vars utils.Vars, result map[string
 	return nil, page.Locator(locator).Click(c.params)
 }
 
-func BuildClick(step config.Step) (Step, error) {
-	r := new(Click)
+func buildClick(step config.Step) (Step, error) {
+	r := new(click)
 	r.conf = step
 	if locator, ok := step["click"].(string); ok {
 		r.locator = locator
