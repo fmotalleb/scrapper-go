@@ -1,4 +1,4 @@
-package engine
+package utils
 
 import (
 	"bytes"
@@ -19,7 +19,17 @@ func unShadow(data map[string]any, key string) map[string]any {
 	return data
 }
 
-func execTemplate(text string, vars Vars, page playwright.Page) (string, error) {
+func EvaluateTemplates(texts []string, vars Vars, page playwright.Page) ([]string, error) {
+	return MapItems(texts, TemplateEvalMapper(vars, page))
+}
+
+func TemplateEvalMapper(vars Vars, page playwright.Page) func(string) (string, error) {
+	return func(s string) (string, error) {
+		return EvaluateTemplate(s, vars, page)
+	}
+}
+
+func EvaluateTemplate(text string, vars Vars, page playwright.Page) (string, error) {
 	templateObj := template.New("template")
 	templateObj = templateObj.Funcs(map[string]any{
 		"eval": page.Evaluate,

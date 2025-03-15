@@ -3,12 +3,12 @@ pipeline:
   # keep_running: 5m
   browser_params:
     headless: false
-  vars:
-    - name: page
-      value: test
   steps:
     - goto: https://tools.admin.dornicafile.ir/test.html
-    - if: |
-        "{{ "156" | eval }}" is 156
-      table: table
-      set-var: table
+    - element: table
+      mode: table
+      set-var: result
+    - click: table225
+      params:
+        timeout: 1000
+      on-error: print
