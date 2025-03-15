@@ -8,12 +8,16 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
+type setupArgs struct {
 	browsers            []string
 	driverDirectory     string
 	onlyInstallShell    bool
 	skipInstallBrowsers bool
 	dryRun              bool
+}
+
+var (
+	setupArg setupArgs
 )
 
 // setupCmd represents the setup command
@@ -23,12 +27,12 @@ var setupCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := playwright.Install(
 			&playwright.RunOptions{
-				OnlyInstallShell:    onlyInstallShell,
-				DriverDirectory:     driverDirectory,
-				SkipInstallBrowsers: skipInstallBrowsers,
+				OnlyInstallShell:    setupArg.onlyInstallShell,
+				DriverDirectory:     setupArg.driverDirectory,
+				SkipInstallBrowsers: setupArg.skipInstallBrowsers,
 				Verbose:             strings.ToLower(logLevel) == "debug",
-				DryRun:              dryRun,
-				Browsers:            browsers,
+				DryRun:              setupArg.dryRun,
+				Browsers:            setupArg.browsers,
 			},
 		); err != nil {
 			slog.Error("failed to install playwright's dependencies", slog.Any("err", err))
@@ -38,9 +42,9 @@ var setupCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(setupCmd)
-	setupCmd.Flags().StringArrayVarP(&browsers, "browsers", "b", []string{"chromium"}, "Only Install Selected Browsers (chromium, firefox, webkit)")
-	setupCmd.Flags().StringVarP(&driverDirectory, "driver-directory", "d", "", "where to put drivers (defaults to cache directory based on os)")
-	setupCmd.Flags().BoolVar(&onlyInstallShell, "just-shell", false, "only install shell")
-	setupCmd.Flags().BoolVar(&skipInstallBrowsers, "skip-browsers", false, "skip browser installation")
-	setupCmd.Flags().BoolVar(&dryRun, "dry-run", false, "dry-run (wont install anything)")
+	setupCmd.Flags().StringArrayVarP(&setupArg.browsers, "browsers", "b", []string{"chromium"}, "Only Install Selected Browsers (chromium, firefox, webkit)")
+	setupCmd.Flags().StringVarP(&setupArg.driverDirectory, "driver-directory", "d", "", "where to put drivers (defaults to cache directory based on os)")
+	setupCmd.Flags().BoolVar(&setupArg.onlyInstallShell, "just-shell", false, "only install shell")
+	setupCmd.Flags().BoolVar(&setupArg.skipInstallBrowsers, "skip-browsers", false, "skip browser installation")
+	setupCmd.Flags().BoolVar(&setupArg.dryRun, "dry-run", false, "dry-run (wont install anything)")
 }
