@@ -1,6 +1,7 @@
 package steps
 
 import (
+	"encoding/base64"
 	"fmt"
 	"log/slog"
 
@@ -47,8 +48,13 @@ func (sc *screenShot) Execute(page playwright.Page, vars utils.Vars, result map[
 
 	// Take a screenshot of the element identified by the locator
 	slog.Debug("taking screenshot for locator", slog.String("locator", locator))
-	_, err = page.Locator(locator).Screenshot(sc.params)
-	return nil, err
+	data, err := page.Locator(locator).Screenshot(sc.params)
+	if err != nil {
+		slog.Error("failed to take screenshot", slog.Any("error", err))
+		return nil, err
+	}
+	b64 := base64.StdEncoding.EncodeToString(data)
+	return b64, nil
 }
 
 func buildScreenShot(step config.Step) (Step, error) {
