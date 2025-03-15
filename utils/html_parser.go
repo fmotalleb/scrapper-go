@@ -46,3 +46,18 @@ func ParseTable(htmlStr string) ([]map[string]any, error) {
 
 	return rows, nil
 }
+
+// ParseTable extracts table data, supporting both key-value and column-row formats
+func ParseTableFlat(htmlStr string) (map[string]any, error) {
+	table, err := ParseTable(htmlStr)
+	if err != nil {
+		return nil, err
+	}
+	result := make(map[string]any)
+	for _, i := range table {
+		for key, value := range i {
+			result[key] = value
+		}
+	}
+	return result, nil
+}

@@ -23,17 +23,19 @@ func init() {
 }
 
 const (
-	GET_HTML  = getTextMode("html")
-	GET_VALUE = getTextMode("value")
-	GET_TEXT  = getTextMode("text")
-	GET_TABLE = getTextMode("table")
+	GET_HTML       = getTextMode("html")
+	GET_VALUE      = getTextMode("value")
+	GET_TEXT       = getTextMode("text")
+	GET_TABLE      = getTextMode("table")
+	GET_TABLE_FLAT = getTextMode("table-flat")
 )
 
 var validModes = map[string]getTextMode{
-	"html":  GET_HTML,
-	"value": GET_VALUE,
-	"text":  GET_TEXT,
-	"table": GET_TABLE,
+	"html":       GET_HTML,
+	"value":      GET_VALUE,
+	"text":       GET_TEXT,
+	"table":      GET_TABLE,
+	"table-flat": GET_TABLE_FLAT,
 }
 
 type getText struct {
@@ -54,25 +56,33 @@ func (g *getText) Execute(page playwright.Page, vars utils.Vars, result map[stri
 		return nil, err
 	}
 	element := page.Locator(locator)
-	var r interface{}
+	var output interface{}
+
 	switch g.mode {
 	case GET_HTML:
-		r, err = element.InnerHTML()
+		output, err = element.InnerHTML()
 
 	case GET_VALUE:
-		r, err = element.InputValue()
+		output, err = element.InputValue()
 
 	case GET_TEXT:
-		r, err = element.TextContent()
+		output, err = element.TextContent()
 
 	case GET_TABLE:
 		var body string
 		body, err = element.InnerHTML()
 		if err == nil {
-			r, err = utils.ParseTable(fmt.Sprintf("<table>%s</table>", body))
+			output, err = utils.ParseTable(fmt.Sprintf("<table>%s</table>", body))
+		}
+	case GET_TABLE_FLAT:
+		var body string
+		body, err = element.InnerHTML()
+		if err == nil {
+			output, err = utils.ParseTableFlat(fmt.Sprintf("<table>%s</table>", body))
 		}
 	}
-	return r, err
+
+	return output, err
 }
 
 func buildElementSelector(step config.Step) (Step, error) {
