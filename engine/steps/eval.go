@@ -36,15 +36,15 @@ func (e *eval) Execute(page playwright.Page, vars utils.Vars, result map[string]
 	if err != nil {
 		return nil, err
 	}
-	fill, err := utils.EvaluateTemplate(e.locator, vars, page)
+	jsCode, err := utils.EvaluateTemplate(e.jsCode, vars, page)
 	if err != nil {
 		return nil, err
 	}
 	var r interface{}
 	if locator == "" {
-		r, err = page.Evaluate(fill, e.params)
+		r, err = page.Evaluate(jsCode, e.params)
 	} else {
-		r, err = page.Locator(locator).Evaluate(fill, e.params)
+		r, err = page.Locator(locator).Evaluate(jsCode, e.params)
 	}
 	return r, err
 }

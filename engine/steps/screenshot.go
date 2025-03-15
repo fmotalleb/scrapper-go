@@ -45,7 +45,7 @@ func buildScreenShot(step config.Step) (Step, error) {
 	if locator, ok := step["screenshot"].(string); ok {
 		r.locator = locator
 	} else {
-		return nil, fmt.Errorf("fill must have a string input got: %v", step)
+		return nil, fmt.Errorf("screenshot must have a string input got: %v", step)
 	}
 
 	r.params = playwright.LocatorScreenshotOptions{}

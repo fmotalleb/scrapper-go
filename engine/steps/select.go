@@ -72,7 +72,7 @@ func (s *selectStep) Execute(page playwright.Page, vars utils.Vars, result map[s
 			return nil, err
 		}
 	} else {
-		slog.Error("failed to execute template on select Indexes", slog.Any("err", err), slog.Any("Indexes", s.labels))
+		slog.Error("failed to execute template on select Indexes", slog.Any("err", err), slog.Any("Indexes", s.indexes))
 		return nil, err
 	}
 
