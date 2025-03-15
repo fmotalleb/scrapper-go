@@ -18,8 +18,10 @@ package main
 
 import (
 	"github.com/fmotalleb/scrapper-go/cmd"
+	"github.com/fmotalleb/scrapper-go/shell"
 )
 
 func main() {
+	shell.RunShell()
 	cmd.Execute()
 }
