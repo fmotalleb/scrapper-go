@@ -21,7 +21,7 @@ func init() {
 
 type Fill struct {
 	locator string
-	Value   string
+	value   string
 	params  playwright.LocatorFillOptions
 	conf    config.Step
 }
@@ -36,7 +36,7 @@ func (f *Fill) Execute(page playwright.Page, vars utils.Vars, result map[string]
 	if err != nil {
 		return nil, err
 	}
-	fill, err := utils.EvaluateTemplate(f.locator, vars, page)
+	fill, err := utils.EvaluateTemplate(f.value, vars, page)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +53,7 @@ func BuildFill(step config.Step) (Step, error) {
 	}
 
 	if value, ok := step["value"].(string); ok {
-		r.Value = value
+		r.value = value
 	} else {
 		return nil, fmt.Errorf("fill must have a string input got: %v", step)
 	}

@@ -40,6 +40,6 @@ func initializeVariables(varsConfig []config.Variable) (utils.Vars, error) {
 		}
 	}
 
-	slog.Info("Variables initialization completed")
+	slog.Info("variables initialization completed")
 	return vars, nil
 }

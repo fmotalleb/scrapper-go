@@ -21,7 +21,7 @@ func init() {
 
 type Eval struct {
 	locator string
-	JsCode  string
+	jsCode  string
 	params  playwright.LocatorEvaluateOptions
 	conf    config.Step
 }
@@ -59,7 +59,7 @@ func BuildEval(step config.Step) (Step, error) {
 	}
 
 	if value, ok := step["eval"].(string); ok {
-		r.JsCode = value
+		r.jsCode = value
 	} else {
 		return nil, fmt.Errorf("eval must have a string input got: %v", step)
 	}

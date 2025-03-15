@@ -11,7 +11,7 @@
       "mode": "auto",
       "program": "${workspaceFolder}",
       "args": [
-        "--config=example/login.yaml",
+        "--config=/home/motalleb/.config/scrapper/login.yaml",
         "--format=yaml",
         "--log-level=DEBUG",
       ]

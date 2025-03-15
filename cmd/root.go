@@ -46,7 +46,7 @@ var rootCmd = &cobra.Command{
 			slog.Error("failed to set log level", slog.Any("err", err))
 			panic(err)
 		}
-		slog.Debug("Level Set To", slog.String("level", logLevel))
+		slog.Debug("level Set To", slog.String("level", logLevel))
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		result, err := engine.ExecuteConfig(cfg)
