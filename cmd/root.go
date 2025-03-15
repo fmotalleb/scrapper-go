@@ -18,6 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"log/slog"
 	"os"
@@ -49,7 +50,7 @@ var rootCmd = &cobra.Command{
 		slog.Debug("level Set To", slog.String("level", logLevel))
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		result, err := engine.ExecuteConfig(cfg)
+		result, err := engine.ExecuteConfig(context.Background(), cfg)
 		if err != nil {
 			slog.Error("failed to execute command", slog.Any("err", err))
 		}

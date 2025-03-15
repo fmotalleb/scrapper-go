@@ -2,6 +2,7 @@
 package engine
 
 import (
+	"context"
 	"fmt"
 	"log/slog"
 	"time"
@@ -12,7 +13,7 @@ import (
 	"github.com/playwright-community/playwright-go"
 )
 
-func ExecuteConfig(config config.ExecutionConfig) (map[string]any, error) {
+func ExecuteConfig(ctx context.Context, config config.ExecutionConfig) (map[string]any, error) {
 	vars, err := initializeVariables(config.Pipeline.Vars)
 	if err != nil {
 		slog.Error("failed to load variables", slog.Any("err", err))
@@ -21,7 +22,12 @@ func ExecuteConfig(config config.ExecutionConfig) (map[string]any, error) {
 	if len(config.Pipeline.Steps) == 0 {
 		return nil, fmt.Errorf("given pipeline does not have any steps, preflight check failed")
 	}
+
 	pw, err := playwright.Run()
+	go func() {
+		<-ctx.Done()
+		pw.Stop()
+	}()
 	if err != nil {
 		slog.Error("could not start Playwright", slog.Any("err", err))
 		return nil, fmt.Errorf("could not start Playwright: %v", err)
