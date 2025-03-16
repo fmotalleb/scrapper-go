@@ -19,7 +19,6 @@ func newNode(label string, collapsible bool) *tview.TreeNode {
 		}
 	})
 	return node
-
 }
 
 func buildTree(data any) *tview.TreeNode {
