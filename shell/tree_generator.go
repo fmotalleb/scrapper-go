@@ -7,16 +7,28 @@ import (
 	"github.com/rivo/tview"
 )
 
-func newNode(lable string) *tview.TreeNode {
-	return tview.NewTreeNode(lable).
+func newNode(label string, collapsible bool) *tview.TreeNode {
+	node := tview.NewTreeNode(label).
 		SetTextStyle(outputTheme).
-		SetSelectable(false)
+		SetSelectable(collapsible)
+	node.SetSelectedFunc(func() {
+		if node.IsExpanded() {
+			node.Collapse()
+		} else {
+			node.Expand()
+		}
+	})
+	return node
+
 }
+
 func buildTree(data any) *tview.TreeNode {
-	root := newNode("root")
+	root := newNode("root", false)
 	buildSubTree(root, data)
 	return root
 }
+
+// buildSubTree of the parent node with data
 func buildSubTree(node *tview.TreeNode, data any) {
 	val := reflect.ValueOf(data)
 	switch val.Kind() {
@@ -26,7 +38,7 @@ func buildSubTree(node *tview.TreeNode, data any) {
 			// Get the value corresponding to the key
 			val := val.MapIndex(key).Interface()
 			// Create a new node for the key
-			subNode := newNode(fmt.Sprintf("%v: %v", key.Interface(), val))
+			subNode := newNode(fmt.Sprintf("%v: %v", key.Interface(), val), true)
 			// Recursively build the subtree for the value
 			if _, ok := val.(string); !ok {
 				buildSubTree(subNode, val)
@@ -39,7 +51,7 @@ func buildSubTree(node *tview.TreeNode, data any) {
 		// Iterate over each element in the slice/array
 		for i := 0; i < val.Len(); i++ {
 			// Create a new node for each index
-			subNode := newNode(fmt.Sprintf("[%d]", i))
+			subNode := newNode(fmt.Sprintf("[%d]", i), true)
 			// Recursively build the subtree for each element
 			buildSubTree(subNode, val.Index(i).Interface())
 			// Add the subNode to the parent node
