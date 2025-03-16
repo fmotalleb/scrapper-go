@@ -26,9 +26,12 @@ func buildSubTree(node *tview.TreeNode, data any) {
 			// Get the value corresponding to the key
 			val := val.MapIndex(key).Interface()
 			// Create a new node for the key
-			subNode := newNode(fmt.Sprintf("%v: %v", key, val))
+			subNode := newNode(fmt.Sprintf("%v: %v", key.Interface(), val))
 			// Recursively build the subtree for the value
-			buildSubTree(subNode, val)
+			if _, ok := val.(string); !ok {
+				buildSubTree(subNode, val)
+			}
+
 			// Add the subNode to the parent node
 			node.AddChild(subNode)
 		}
