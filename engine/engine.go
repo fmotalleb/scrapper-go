@@ -129,11 +129,11 @@ func ExecuteStream(ctx context.Context, config config.ExecutionConfig, pipeline 
 		return nil, fmt.Errorf("page creation failed: %w", err)
 	}
 
-	result := make(map[string]any)
 	resultChan := make(chan map[string]any)
 
 	go func() {
 		for i := range pipeline {
+			result := make(map[string]any)
 			stepList, err := steps.BuildSteps(i)
 			if err != nil {
 				slog.Error("failed to build step", slog.Any("step", i))
