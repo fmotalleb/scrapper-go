@@ -11,10 +11,10 @@ import (
 func createLogView() *tview.TextView {
 	logBox := tview.NewTextView()
 	logBox.SetText("waiting for logs to arrive ...").
-		SetTextStyle(outputTheme).
+		SetTextStyle(logOutputTheme).
 		SetBackgroundColor(backgroundColor).
 		SetBorder(true).
-		SetBorderStyle(outputTheme)
+		SetBorderStyle(logOutputTheme)
 
 	logOutput := &logBuffer{
 		viewPort: logBox,

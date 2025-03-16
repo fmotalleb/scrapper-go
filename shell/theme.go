@@ -3,13 +3,15 @@ package shell
 import "github.com/gdamore/tcell/v2"
 
 var (
-	backgroundColor       = tcell.NewRGBColor(30, 30, 30)
-	inputBg               = tcell.NewRGBColor(45, 45, 48)
-	outputBg              = tcell.NewRGBColor(37, 37, 38)
-	foreGround            = tcell.NewRGBColor(220, 220, 220)
-	buttonBackgroundColor = tcell.NewRGBColor(70, 70, 70)
-	buttonTextColor       = tcell.NewRGBColor(220, 220, 220)
+	// Darker background and more vibrant colors for contrast and readability.
+	backgroundColor       = tcell.NewRGBColor(24, 24, 26)    // Very dark gray, almost black.
+	inputBg               = tcell.NewRGBColor(40, 40, 45)    // Slightly lighter dark for input areas.
+	outputBg              = tcell.NewRGBColor(28, 28, 30)    // Dark gray for output.
+	foreGround            = tcell.NewRGBColor(230, 230, 240) // Light grayish text for good contrast.
+	buttonBackgroundColor = tcell.NewRGBColor(60, 60, 65)    // Subtle dark for buttons.
+	buttonTextColor       = tcell.NewRGBColor(255, 255, 255) // White text for buttons for clear visibility.
 
+	// Styles for input and output areas, with enhanced contrast.
 	inputTheme = tcell.StyleDefault.
 			Background(inputBg).
 			Foreground(foreGround)
@@ -17,4 +19,6 @@ var (
 	outputTheme = tcell.StyleDefault.
 			Background(outputBg).
 			Foreground(foreGround)
+	logOutputTheme = outputTheme.
+			Dim(true)
 )
