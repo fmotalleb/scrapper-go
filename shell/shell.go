@@ -10,7 +10,7 @@ import (
 func RunShell() {
 	opt := ""
 	test := ""
-	app := tview.NewApplication()
+	app := tview.NewApplication().EnableMouse(true)
 
 	opts := []string{"Option 1", "Option 2", "Option 3"}
 	// Create a form
