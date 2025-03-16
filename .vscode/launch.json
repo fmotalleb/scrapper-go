@@ -26,6 +26,18 @@
         "serve",
         "--log-level=DEBUG",
       ]
+    },
+    {
+      "name": "Serve Shell",
+      "type": "go",
+      "request": "launch",
+      "console": "integratedTerminal",
+      "mode": "auto",
+      "program": "${workspaceFolder}",
+      "args": [
+        "shell",
+        "--log-level=DEBUG",
+      ]
     }
   ]
 }

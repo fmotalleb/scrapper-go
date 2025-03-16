@@ -29,9 +29,6 @@ var wsUpgrade = websocket.Upgrader{
 }
 
 func liveStream(c echo.Context) error {
-	// if !c.IsWebSocket() {
-	// 	c.String(http.StatusBadRequest, "this endpoint is websocket, received a non-websocket connection")
-	// }
 	sendChan := make(chan map[string]any)
 	recvChan := handleWebSocket(c, sendChan)
 
