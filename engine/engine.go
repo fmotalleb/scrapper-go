@@ -95,11 +95,12 @@ func ExecuteStream(ctx context.Context, config config.ExecutionConfig, pipeline 
 		slog.Error("could not start Playwright", slog.Any("err", err))
 		return nil, fmt.Errorf("playwright startup failed: %w", err)
 	}
-	defer func() {
-		if err := pw.Stop(); err != nil {
-			slog.Warn("failed to stop Playwright session", slog.Any("err", err))
-		}
-	}()
+
+	// defer func() {
+	// 	if err := pw.Stop(); err != nil {
+	// 		slog.Warn("failed to stop Playwright session", slog.Any("err", err))
+	// 	}
+	// }()
 
 	// Stop Playwright when context is canceled
 	killWithContext(ctx, pw)
@@ -112,11 +113,11 @@ func ExecuteStream(ctx context.Context, config config.ExecutionConfig, pipeline 
 		slog.Error("could not launch browser", slog.Any("err", err))
 		return nil, err
 	}
-	defer func() {
-		if err := browser.Close(); err != nil {
-			slog.Error("failed to close browser", slog.Any("err", err))
-		}
-	}()
+	// defer func() {
+	// 	if err := browser.Close(); err != nil {
+	// 		slog.Error("failed to close browser", slog.Any("err", err))
+	// 	}
+	// }()
 
 	// Handle KeepRunning at the end
 	defer handleKeepRunning(config.Pipeline.KeepRunning)

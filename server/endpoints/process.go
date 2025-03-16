@@ -22,7 +22,6 @@ func init() {
 }
 
 func processPipeline(c echo.Context) error {
-	slog.Info("test")
 	cfgMap := make(map[string]any)
 
 	err := json.NewDecoder(c.Request().Body).Decode(&cfgMap)
