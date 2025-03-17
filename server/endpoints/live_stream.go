@@ -16,7 +16,7 @@ func init() {
 	registerEndpoint(
 		endpoint{
 			method:  "GET",
-			path:    "/live_stream",
+			path:    "/live-stream",
 			handler: liveStream,
 		},
 	)
