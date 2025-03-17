@@ -11,7 +11,7 @@ func init() {
 	registerEndpoint(
 		endpoint{
 			method:  "DELETE",
-			path:    "/session/:id",
+			path:    "/sessions/:id",
 			handler: sessionKill,
 		},
 	)

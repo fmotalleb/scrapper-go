@@ -16,13 +16,13 @@ func init() {
 	registerEndpoint(
 		endpoint{
 			method:  "POST",
-			path:    "/session",
-			handler: sessionCreate,
+			path:    "/sessions",
+			handler: sessionsCreate,
 		},
 	)
 }
 
-func sessionCreate(c echo.Context) error {
+func sessionsCreate(c echo.Context) error {
 	cfgMap := make(map[string]any)
 	timeoutStr := c.Param("timeout")
 	timeout, err := time.ParseDuration(timeoutStr)

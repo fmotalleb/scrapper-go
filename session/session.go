@@ -63,6 +63,17 @@ func NewSession(cfg config.ExecutionConfig, timeout time.Duration) (*Session, er
 	return session, nil
 }
 
+func GetSessions() []string {
+	store.mutex.Lock()
+	defer store.mutex.Unlock()
+	result := make([]string, len(store.sessions))
+	index := 0
+	for id, _ := range store.sessions {
+		result[index] = id
+		index++
+	}
+	return result
+}
 func GetSession(id string) (*Session, bool) {
 	store.mutex.Lock()
 	defer store.mutex.Unlock()

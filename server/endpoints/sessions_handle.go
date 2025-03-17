@@ -14,8 +14,8 @@ import (
 func init() {
 	registerEndpoint(
 		endpoint{
-			method:  "PUT",
-			path:    "/session/:id",
+			method:  "POST",
+			path:    "/sessions/:id",
 			handler: sessionHandle,
 		},
 	)
