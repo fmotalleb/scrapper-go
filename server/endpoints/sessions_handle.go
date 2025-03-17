@@ -21,19 +21,18 @@ func init() {
 	)
 }
 func sessionHandle(c echo.Context) error {
+	id := c.Param("id")
+	slog.Info("session handle requested", slog.String("id", id))
+	sess, ok := session.GetSession(id)
+	if !ok {
+		return c.JSON(http.StatusNotFound, map[string]any{"id": id})
+	}
 	var cfgInterface any
 	err := json.NewDecoder(c.Request().Body).Decode(&cfgInterface)
 	if err != nil {
 		slog.Error("failed to parse body", slog.Any("err", err))
 		return c.String(http.StatusBadRequest, "cannot unmarshal the given json body")
 	}
-
-	id := c.Param("id")
-	sess, ok := session.GetSession(id)
-	if !ok {
-		return c.JSON(http.StatusNotFound, map[string]any{"id": id})
-	}
-
 	switch v := cfgInterface.(type) {
 	case map[string]any:
 		var cfg config.Step

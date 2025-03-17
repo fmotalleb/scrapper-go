@@ -1,6 +1,7 @@
 package endpoints
 
 import (
+	"log/slog"
 	"net/http"
 
 	"github.com/fmotalleb/scrapper-go/session"
@@ -19,6 +20,8 @@ func init() {
 
 func sessionKill(c echo.Context) error {
 	id := c.Param("id")
+	slog.Info("session kill requested", slog.String("id", id))
+
 	if session, ok := session.GetSession(id); ok {
 		session.Kill()
 		return c.JSON(http.StatusOK, map[string]any{
