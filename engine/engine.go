@@ -29,7 +29,7 @@ func ExecuteConfig(ctx context.Context, config config.ExecutionConfig) (map[stri
 	pw, err := playwright.Run()
 	if err != nil {
 		slog.Error("could not start Playwright", slog.Any("err", err))
-		return nil, fmt.Errorf("Playwright startup failed: %w", err)
+		return nil, fmt.Errorf("playwright startup failed: %w", err)
 	}
 	defer func() {
 		if err := pw.Stop(); err != nil {
@@ -80,6 +80,65 @@ func ExecuteConfig(ctx context.Context, config config.ExecutionConfig) (map[stri
 
 	slog.Info("Execution finished", slog.Any("vars_snapshot", vars.Snapshot()), slog.Any("result", result))
 	return result, nil
+}
+
+func ExecuteStream(ctx context.Context, config config.ExecutionConfig, pipeline <-chan []config.Step) (<-chan map[string]any, error) {
+	vars, err := initializeVariables(config.Pipeline.Vars)
+	if err != nil {
+		slog.Error("failed to load variables", slog.Any("err", err))
+		return nil, fmt.Errorf("preflight check failed: %w", err)
+	}
+
+	// Start Playwright
+	pw, err := playwright.Run()
+	if err != nil {
+		slog.Error("could not start Playwright", slog.Any("err", err))
+		return nil, fmt.Errorf("playwright startup failed: %w", err)
+	}
+
+	// Stop Playwright when context is canceled
+	killWithContext(ctx, pw)
+
+	slog.Info("Playwright initialized")
+
+	// Launch Browser
+	browser, err := launchBrowser(pw, config.Pipeline.Browser, config.Pipeline.BrowserParams)
+	if err != nil {
+		slog.Error("could not launch browser", slog.Any("err", err))
+		return nil, err
+	}
+
+	// Handle KeepRunning at the end
+	defer handleKeepRunning(config.Pipeline.KeepRunning)
+
+	// Create Page
+	page, err := browser.NewPage(config.Pipeline.BrowserOptions)
+	if err != nil {
+		slog.Error("could not create page", slog.Any("err", err))
+		return nil, fmt.Errorf("page creation failed: %w", err)
+	}
+
+	resultChan := make(chan map[string]any)
+
+	go func() {
+		for i := range pipeline {
+			result := make(map[string]any)
+			stepList, err := steps.BuildSteps(i)
+			if err != nil {
+				slog.Error("failed to build step", slog.Any("step", i))
+				continue
+			}
+			for _, step := range stepList {
+				if err = middlewares.HandleStep(page, step, vars, result); err != nil {
+					slog.Error("failed to handle step", slog.Any("step", i))
+					continue
+				}
+			}
+			resultChan <- result
+		}
+	}()
+
+	return resultChan, nil
 }
 
 func killWithContext(ctx context.Context, pw *playwright.Playwright) {
