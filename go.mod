@@ -7,6 +7,7 @@ require (
 	github.com/client9/misspell v0.3.4
 	github.com/gdamore/tcell/v2 v2.8.1
 	github.com/golangci/golangci-lint v1.64.7
+	github.com/google/uuid v1.6.0
 	github.com/goreleaser/goreleaser v1.26.2
 	github.com/gorilla/websocket v1.5.3
 	github.com/labstack/echo/v4 v4.13.3
@@ -240,7 +241,6 @@ require (
 	github.com/google/rpmpack v0.6.1-0.20240329070804-c2247cbb881a // indirect
 	github.com/google/s2a-go v0.1.9 // indirect
 	github.com/google/safetext v0.0.0-20220905092116-b49f7bc46da2 // indirect
-	github.com/google/uuid v1.6.0 // indirect
 	github.com/google/wire v0.6.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.4 // indirect
 	github.com/googleapis/gax-go/v2 v2.14.1 // indirect
