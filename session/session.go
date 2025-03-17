@@ -88,7 +88,11 @@ func GetSession(id string) (*Session, bool) {
 
 func (s *Session) Handle(steps ...config.Step) (*map[string]any, error) {
 	s.resetTimer()
-	defer s.resetTimer()
+	s.lock.Lock()
+	defer func() {
+		s.resetTimer()
+		s.lock.Unlock()
+	}()
 	s.sendChannel <- steps
 
 	slog.Debug("Steps sent to session", slog.String("session_id", s.ID), slog.Any("steps", steps))

@@ -38,14 +38,19 @@ func sessionsCreate(c echo.Context) error {
 	var cfg config.ExecutionConfig
 	err = mapstructure.Decode(cfgMap, &cfg)
 	if err != nil {
-		slog.Error("failed to read config from body", slog.Any("err", err))
-		return c.String(http.StatusBadRequest, "cannot unmarshal the given json body")
+		slog.Error("failed to map config structure", slog.Any("err", err))
+		return c.JSON(http.StatusBadRequest, map[string]any{
+			"error": "Invalid configuration structure: " + err.Error(),
+		})
 	}
 	res, err := session.NewSession(cfg, timeout)
 	if err != nil {
-		slog.Error("failed to execute config", slog.Any("err", err))
-		return c.String(http.StatusBadRequest, "failed to execute config. make sure the config is compatible with service")
+		slog.Error("failed to create session", slog.Any("err", err))
+		return c.JSON(http.StatusBadRequest, map[string]any{
+			"error": "Failed to create session: " + err.Error(),
+		})
 	}
+	slog.Info("session created successfully", slog.String("id", res.ID), slog.Duration("timeout", timeout))
 	return c.JSON(
 		http.StatusOK,
 		map[string]any{
