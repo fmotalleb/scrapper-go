@@ -38,8 +38,8 @@ func liveStream(c echo.Context) error {
 	err := mapstructure.Decode(cfgMap, &cfg)
 	if err != nil {
 		slog.Error("failed to read config from body", slog.Any("err", err))
-		c.String(http.StatusBadRequest, "cannot unmarshal the given json body")
-		return err
+
+		return c.String(http.StatusBadRequest, "cannot unmarshal the given json body")
 	}
 	pipe := make(chan []config.Step)
 	resultChan, err := engine.ExecuteStream(c.Request().Context(), cfg, pipe)

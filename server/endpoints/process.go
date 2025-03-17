@@ -27,21 +27,18 @@ func processPipeline(c echo.Context) error {
 	err := json.NewDecoder(c.Request().Body).Decode(&cfgMap)
 	if err != nil {
 		slog.Error("failed to body", slog.Any("err", err))
-		c.String(http.StatusBadRequest, "cannot unmarshal the given json body")
-		return err
+		return c.String(http.StatusBadRequest, "cannot unmarshal the given json body")
 	}
 	var cfg config.ExecutionConfig
 	err = mapstructure.Decode(cfgMap, &cfg)
 	if err != nil {
 		slog.Error("failed to read config from body", slog.Any("err", err))
-		c.String(http.StatusBadRequest, "cannot unmarshal the given json body")
-		return err
+		return c.String(http.StatusBadRequest, "cannot unmarshal the given json body")
 	}
 	res, err := engine.ExecuteConfig(c.Request().Context(), cfg)
 	if err != nil {
 		slog.Error("failed to execute config", slog.Any("err", err))
-		c.String(http.StatusBadRequest, "failed to execute config. make sure the config is compatible with service")
-		return err
+		return c.String(http.StatusBadRequest, "failed to execute config. make sure the config is compatible with service")
 	}
 	return c.JSON(http.StatusOK, res)
 }
