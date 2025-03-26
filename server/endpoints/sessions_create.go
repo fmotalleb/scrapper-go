@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/fmotalleb/scrapper-go/config"
+	"github.com/fmotalleb/scrapper-go/log"
 	"github.com/fmotalleb/scrapper-go/session"
 	"github.com/labstack/echo/v4"
 	"github.com/mitchellh/mapstructure"
@@ -32,20 +33,20 @@ func sessionsCreate(c echo.Context) error {
 
 	err = json.NewDecoder(c.Request().Body).Decode(&cfgMap)
 	if err != nil {
-		slog.Error("failed to body", slog.Any("err", err))
+		slog.Error("failed to body", log.ErrVal(err))
 		return c.String(http.StatusBadRequest, "cannot unmarshal the given json body")
 	}
 	var cfg config.ExecutionConfig
 	err = mapstructure.Decode(cfgMap, &cfg)
 	if err != nil {
-		slog.Error("failed to map config structure", slog.Any("err", err))
+		slog.Error("failed to map config structure", log.ErrVal(err))
 		return c.JSON(http.StatusBadRequest, map[string]any{
 			"error": "Invalid configuration structure: " + err.Error(),
 		})
 	}
 	res, err := session.NewSession(cfg, timeout)
 	if err != nil {
-		slog.Error("failed to create session", slog.Any("err", err))
+		slog.Error("failed to create session", log.ErrVal(err))
 		return c.JSON(http.StatusBadRequest, map[string]any{
 			"error": "Failed to create session: " + err.Error(),
 		})

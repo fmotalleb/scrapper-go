@@ -1,12 +1,12 @@
 package endpoints
 
 import (
-	"log"
 	"log/slog"
 	"net/http"
 
 	"github.com/fmotalleb/scrapper-go/config"
 	"github.com/fmotalleb/scrapper-go/engine"
+	"github.com/fmotalleb/scrapper-go/log"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
 	"github.com/mitchellh/mapstructure"
@@ -37,12 +37,21 @@ func liveStream(c echo.Context) error {
 	var cfg config.ExecutionConfig
 	err := mapstructure.Decode(cfgMap, &cfg)
 	if err != nil {
-		slog.Error("failed to read config from body", slog.Any("err", err))
+		slog.Error("failed to read config from body", log.ErrVal(err))
 
 		return c.String(http.StatusBadRequest, "cannot unmarshal the given json body")
 	}
 	pipe := make(chan []config.Step)
 	resultChan, err := engine.ExecuteStream(c.Request().Context(), cfg, pipe)
+	if err != nil {
+		slog.Error(
+			"failed to spawn an engine using config",
+			log.ErrVal(err),
+			slog.Any("cfg", cfg),
+		)
+
+		return c.String(http.StatusBadRequest, "cannot unmarshal the given json body")
+	}
 	go func() {
 		for i := range resultChan {
 			sendChan <- i
@@ -52,7 +61,7 @@ func liveStream(c echo.Context) error {
 		var cfg config.Step
 		err = mapstructure.Decode(i, &cfg)
 		if err != nil {
-			slog.Error("failed to read config from body", slog.Any("err", err))
+			slog.Error("failed to read config from body", log.ErrVal(err))
 			sendChan <- map[string]any{
 				"error": err.Error(),
 			}
@@ -62,7 +71,7 @@ func liveStream(c echo.Context) error {
 	}
 
 	// if err != nil {
-	// 	slog.Error("failed to execute config", slog.Any("err", err))
+	// 	slog.Error("failed to execute config", log.ErrVal(err))
 	// 	c.String(http.StatusBadRequest, "failed to execute config. make sure the config is compatible with service")
 	// 	return err
 	// }
@@ -74,7 +83,7 @@ func liveStream(c echo.Context) error {
 func handleWebSocket(c echo.Context, sendChan chan map[string]any) chan map[string]any {
 	conn, err := wsUpgrade.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {
-		log.Println("WebSocket upgrade error:", err)
+		slog.Error("webSocket upgrade error:", err)
 		return nil
 	}
 
@@ -86,7 +95,7 @@ func handleWebSocket(c echo.Context, sendChan chan map[string]any) chan map[stri
 		for {
 			var msg map[string]any
 			if err := conn.ReadJSON(&msg); err != nil {
-				slog.Error("read error:", slog.Any("error", err))
+				slog.Error("read error:", log.ErrVal(err))
 				close(recvChan)
 				return
 			}
@@ -99,7 +108,7 @@ func handleWebSocket(c echo.Context, sendChan chan map[string]any) chan map[stri
 		defer conn.Close()
 		for msg := range sendChan {
 			if err := conn.WriteJSON(msg); err != nil {
-				slog.Error("write error:", slog.Any("error", err))
+				slog.Error("write error:", log.ErrVal(err))
 				return
 			}
 		}

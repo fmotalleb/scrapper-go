@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/fmotalleb/scrapper-go/config"
+	"github.com/fmotalleb/scrapper-go/log"
 	"github.com/fmotalleb/scrapper-go/utils"
 	"github.com/playwright-community/playwright-go"
 )
@@ -40,7 +41,7 @@ func (s *sleep) Execute(page playwright.Page, vars utils.Vars, result map[string
 	// Parse the evaluated string to duration
 	value, err := time.ParseDuration(waitTime)
 	if err != nil {
-		slog.Error("failed to parse the sleep duration", slog.String("input", waitTime), slog.Any("err", err))
+		slog.Error("failed to parse the sleep duration", slog.String("input", waitTime), log.ErrVal(err))
 		return nil, err
 	}
 

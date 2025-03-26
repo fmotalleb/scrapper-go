@@ -8,6 +8,7 @@ import (
 
 	"github.com/fmotalleb/scrapper-go/config"
 	"github.com/fmotalleb/scrapper-go/engine"
+	"github.com/fmotalleb/scrapper-go/log"
 	"github.com/fmotalleb/scrapper-go/utils"
 	"github.com/google/uuid"
 )
@@ -39,7 +40,7 @@ func NewSession(cfg config.ExecutionConfig, timeout time.Duration) (*Session, er
 	receiveChannel, err := engine.ExecuteStream(ctx, cfg, sendChannel)
 	if err != nil {
 		cancel()
-		slog.Error("Failed to execute stream", slog.Any("error", err))
+		slog.Error("Failed to execute stream", log.ErrVal(err))
 		return nil, err
 	}
 	timer := time.NewTimer(timeout)
@@ -101,7 +102,7 @@ func (s *Session) Handle(steps ...config.Step) (*map[string]any, error) {
 		slog.Debug("Operation failed",
 			slog.String("session_id", s.ID),
 			slog.Any("steps", steps),
-			slog.Any("error", err),
+			log.ErrVal(err),
 		)
 		return nil, err
 	}

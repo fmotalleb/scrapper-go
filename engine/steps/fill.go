@@ -5,6 +5,7 @@ import (
 	"log/slog"
 
 	"github.com/fmotalleb/scrapper-go/config"
+	"github.com/fmotalleb/scrapper-go/log"
 	"github.com/fmotalleb/scrapper-go/utils"
 	"github.com/playwright-community/playwright-go"
 )
@@ -35,13 +36,13 @@ func (f *fill) Execute(page playwright.Page, vars utils.Vars, result map[string]
 	// Evaluate locator and value templates
 	locator, err := utils.EvaluateTemplate(f.locator, vars, page)
 	if err != nil {
-		slog.Error("failed to evaluate locator template", slog.Any("locator", f.locator), slog.Any("error", err))
+		slog.Error("failed to evaluate locator template", slog.Any("locator", f.locator), log.ErrVal(err))
 		return nil, err
 	}
 
 	fillValue, err := utils.EvaluateTemplate(f.value, vars, page)
 	if err != nil {
-		slog.Error("failed to evaluate value template", slog.Any("value", f.value), slog.Any("error", err))
+		slog.Error("failed to evaluate value template", slog.Any("value", f.value), log.ErrVal(err))
 		return nil, err
 	}
 
@@ -73,7 +74,7 @@ func buildFill(step config.Step) (Step, error) {
 	// Load additional parameters
 	r.params = playwright.LocatorFillOptions{}
 	if params, err := utils.LoadParams[playwright.LocatorFillOptions](step); err != nil {
-		slog.Error("failed to load parameters for fill", slog.Any("error", err), slog.Any("step", step))
+		slog.Error("failed to load parameters for fill", log.ErrVal(err), slog.Any("step", step))
 		return nil, err
 	} else {
 		r.params = *params

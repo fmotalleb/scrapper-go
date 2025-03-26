@@ -44,7 +44,7 @@ var rootCmd = &cobra.Command{
 	Short: "A Simple playwright wrapper that executes a simple yaml pipeline",
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		if err := log.SetupLogger(logLevel); err != nil {
-			slog.Error("failed to set log level", slog.Any("err", err))
+			slog.Error("failed to set log level", log.ErrVal(err))
 			panic(err)
 		}
 		slog.Debug("level Set To", slog.String("level", logLevel))
@@ -52,16 +52,16 @@ var rootCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		result, err := engine.ExecuteConfig(context.Background(), cfg)
 		if err != nil {
-			slog.Error("failed to execute command", slog.Any("err", err))
+			slog.Error("failed to execute command", log.ErrVal(err))
 		}
 
 		formatted, err := utils.Output(format).Format(result)
 		if err != nil {
-			slog.Error("failed to format", slog.Any("err", err))
+			slog.Error("failed to format", log.ErrVal(err))
 			return
 		}
 		if _, err := fmt.Fprint(os.Stdout, formatted); err != nil {
-			slog.Error("failed to print output", slog.Any("err", err))
+			slog.Error("failed to print output", log.ErrVal(err))
 		}
 	},
 }
@@ -107,7 +107,7 @@ func initConfig() {
 		slog.Debug("using config file", slog.String("config", viper.ConfigFileUsed()))
 	}
 	if err := viper.Unmarshal(&cfg); err != nil {
-		slog.Error("unable to decode into struct: %v", slog.Any("err", err))
+		slog.Error("unable to decode into struct: %v", log.ErrVal(err))
 		panic("configuration error")
 	}
 	slog.Debug("loaded config file", slog.Any("config", cfg))

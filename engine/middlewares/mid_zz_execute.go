@@ -5,6 +5,7 @@ import (
 	"log/slog"
 
 	"github.com/fmotalleb/scrapper-go/engine/steps"
+	"github.com/fmotalleb/scrapper-go/log"
 	"github.com/fmotalleb/scrapper-go/utils"
 	playwright "github.com/playwright-community/playwright-go"
 )
@@ -21,7 +22,7 @@ func exec(p playwright.Page, s steps.Step, v utils.Vars, r map[string]any, next 
 
 	result, err := s.Execute(p, v, r)
 	if err != nil {
-		slog.Error("step execution failed", slog.Any("step", s.GetConfig()), slog.Any("error", err))
+		slog.Error("step execution failed", slog.Any("step", s.GetConfig()), log.ErrVal(err))
 		return err
 	}
 

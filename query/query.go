@@ -6,6 +6,8 @@ import (
 	"log/slog"
 	"regexp"
 	"strings"
+
+	"github.com/fmotalleb/scrapper-go/log"
 )
 
 type operator func(string, string) (bool, error)
@@ -15,7 +17,7 @@ var operators = map[string]operator{
 	"match": func(s1, s2 string) (bool, error) {
 		r, err := regexp.Compile(s1)
 		if err != nil {
-			slog.Error("invalid regex", slog.Any("err", err), slog.Any("pattern", s1))
+			slog.Error("invalid regex", log.ErrVal(err), slog.Any("pattern", s1))
 			return false, fmt.Errorf("invalid regex: %v", err)
 		}
 		return r.MatchString(s2), nil
@@ -72,7 +74,7 @@ func (q *Query) EvaluateQuery(data map[string]string) (bool, error) {
 
 	result, err := op(val, q.Value)
 	if err != nil {
-		slog.Error("error evaluating operator", slog.String("op", q.Op), slog.Any("err", err))
+		slog.Error("error evaluating operator", slog.String("op", q.Op), log.ErrVal(err))
 		return false, err
 	}
 

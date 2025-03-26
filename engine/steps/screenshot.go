@@ -6,6 +6,7 @@ import (
 	"log/slog"
 
 	"github.com/fmotalleb/scrapper-go/config"
+	"github.com/fmotalleb/scrapper-go/log"
 	"github.com/fmotalleb/scrapper-go/utils"
 	"github.com/playwright-community/playwright-go"
 )
@@ -35,7 +36,7 @@ func (sc *screenShot) Execute(page playwright.Page, vars utils.Vars, result map[
 	// Evaluate the locator template
 	locator, err := utils.EvaluateTemplate(sc.locator, vars, page)
 	if err != nil {
-		slog.Error("failed to evaluate locator template", slog.String("locator", sc.locator), slog.Any("error", err))
+		slog.Error("failed to evaluate locator template", slog.String("locator", sc.locator), log.ErrVal(err))
 		return nil, err
 	}
 
@@ -50,7 +51,7 @@ func (sc *screenShot) Execute(page playwright.Page, vars utils.Vars, result map[
 	slog.Debug("taking screenshot for locator", slog.String("locator", locator))
 	data, err := page.Locator(locator).Screenshot(sc.params)
 	if err != nil {
-		slog.Error("failed to take screenshot", slog.Any("error", err))
+		slog.Error("failed to take screenshot", log.ErrVal(err))
 		return nil, err
 	}
 	b64 := base64.StdEncoding.EncodeToString(data)
@@ -71,7 +72,7 @@ func buildScreenShot(step config.Step) (Step, error) {
 	// Load additional parameters for the screenshot
 	r.params = playwright.LocatorScreenshotOptions{}
 	if params, err := utils.LoadParams[playwright.LocatorScreenshotOptions](step); err != nil {
-		slog.Error("failed to read screenshot params", slog.Any("error", err), slog.Any("step", step))
+		slog.Error("failed to read screenshot params", log.ErrVal(err), slog.Any("step", step))
 		return nil, err
 	} else {
 		r.params = *params

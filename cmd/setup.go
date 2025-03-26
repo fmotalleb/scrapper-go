@@ -4,6 +4,7 @@ import (
 	"log/slog"
 	"strings"
 
+	"github.com/fmotalleb/scrapper-go/log"
 	"github.com/playwright-community/playwright-go"
 	"github.com/spf13/cobra"
 )
@@ -35,7 +36,7 @@ var setupCmd = &cobra.Command{
 				Browsers:            setupArg.browsers,
 			},
 		); err != nil {
-			slog.Error("failed to install playwright's dependencies", slog.Any("err", err))
+			slog.Error("failed to install playwright's dependencies", log.ErrVal(err))
 		}
 	},
 }

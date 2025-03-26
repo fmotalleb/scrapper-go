@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/fmotalleb/scrapper-go/config"
+	"github.com/fmotalleb/scrapper-go/log"
 	"github.com/fmotalleb/scrapper-go/utils"
 	"github.com/playwright-community/playwright-go"
 )
@@ -50,7 +51,7 @@ func (s *selectStep) Execute(page playwright.Page, vars utils.Vars, result map[s
 	setValuesOrLabels := func(fieldName string, target *[]string) error {
 		values, err := utils.EvaluateTemplates(*target, vars, page)
 		if err != nil {
-			slog.Error(fmt.Sprintf("failed to execute template on %s", fieldName), slog.Any("err", err), slog.Any(fieldName, *target))
+			slog.Error(fmt.Sprintf("failed to execute template on %s", fieldName), log.ErrVal(err), slog.Any(fieldName, *target))
 			return err
 		}
 		*target = values
@@ -76,11 +77,11 @@ func (s *selectStep) Execute(page playwright.Page, vars utils.Vars, result map[s
 		if values, err := utils.MapItems(values, strconv.Atoi); err == nil {
 			selectOpt.Indexes = &values
 		} else {
-			slog.Error("failed to convert indexes to integer", slog.Any("err", err), slog.Any("Indexes(AfterEval)", values))
+			slog.Error("failed to convert indexes to integer", log.ErrVal(err), slog.Any("Indexes(AfterEval)", values))
 			return nil, err
 		}
 	} else {
-		slog.Error("failed to execute template on select Indexes", slog.Any("err", err), slog.Any("Indexes", s.indexes))
+		slog.Error("failed to execute template on select Indexes", log.ErrVal(err), slog.Any("Indexes", s.indexes))
 		return nil, err
 	}
 
@@ -121,7 +122,7 @@ func buildSelect(step config.Step) (Step, error) {
 	// Load additional parameters for the select action
 	r.params = playwright.LocatorSelectOptionOptions{}
 	if params, err := utils.LoadParams[playwright.LocatorSelectOptionOptions](step); err != nil {
-		slog.Error("failed to read params", slog.Any("err", err), slog.Any("step", step))
+		slog.Error("failed to read params", log.ErrVal(err), slog.Any("step", step))
 		return nil, err
 	} else {
 		r.params = *params

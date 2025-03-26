@@ -5,6 +5,7 @@ import (
 	"log/slog"
 
 	"github.com/fmotalleb/scrapper-go/config"
+	"github.com/fmotalleb/scrapper-go/log"
 	"github.com/fmotalleb/scrapper-go/utils"
 	"github.com/playwright-community/playwright-go"
 )
@@ -52,7 +53,7 @@ func (s *getText) GetConfig() config.Step {
 func (g *getText) Execute(page playwright.Page, vars utils.Vars, result map[string]any) (interface{}, error) {
 	locator, err := utils.EvaluateTemplate(g.locator, vars, page)
 	if err != nil {
-		slog.Error("failed to evaluate locator template", slog.String("locator", g.locator), slog.Any("error", err))
+		slog.Error("failed to evaluate locator template", slog.String("locator", g.locator), log.ErrVal(err))
 		return nil, err
 	}
 	element := page.Locator(locator)
@@ -86,7 +87,7 @@ func (g *getText) Execute(page playwright.Page, vars utils.Vars, result map[stri
 	}
 
 	if err != nil {
-		slog.Error("failed to fetch content from element", slog.String("locator", locator), slog.String("mode", string(g.mode)), slog.Any("error", err))
+		slog.Error("failed to fetch content from element", slog.String("locator", locator), slog.String("mode", string(g.mode)), log.ErrVal(err))
 	}
 	return output, err
 }
@@ -119,7 +120,7 @@ func buildElementSelector(step config.Step) (Step, error) {
 	// Load optional parameters
 	r.params = playwright.LocatorEvaluateOptions{}
 	if params, err := utils.LoadParams[playwright.LocatorEvaluateOptions](step); err != nil {
-		slog.Error("failed to read params", slog.Any("error", err), slog.Any("step", step))
+		slog.Error("failed to read params", log.ErrVal(err), slog.Any("step", step))
 		return nil, err
 	} else {
 		r.params = *params

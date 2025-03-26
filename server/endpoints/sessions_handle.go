@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/fmotalleb/scrapper-go/config"
+	"github.com/fmotalleb/scrapper-go/log"
 	"github.com/fmotalleb/scrapper-go/session"
 	"github.com/labstack/echo/v4"
 	"github.com/mitchellh/mapstructure"
@@ -30,7 +31,7 @@ func sessionHandle(c echo.Context) error {
 	var cfgInterface any
 	err := json.NewDecoder(c.Request().Body).Decode(&cfgInterface)
 	if err != nil {
-		slog.Error("failed to parse body", slog.Any("err", err))
+		slog.Error("failed to parse body", log.ErrVal(err))
 		return c.String(http.StatusBadRequest, "cannot unmarshal the given json body")
 	}
 	switch v := cfgInterface.(type) {
@@ -38,12 +39,12 @@ func sessionHandle(c echo.Context) error {
 		var cfg config.Step
 		err = mapstructure.Decode(v, &cfg)
 		if err != nil {
-			slog.Error("failed to decode config", slog.Any("err", err))
+			slog.Error("failed to decode config", log.ErrVal(err))
 			return c.String(http.StatusBadRequest, "invalid config format")
 		}
 		res, err := sess.Handle(cfg)
 		if err != nil {
-			slog.Error("failed to execute config", slog.Any("err", err))
+			slog.Error("failed to execute config", log.ErrVal(err))
 			return c.String(http.StatusBadRequest, "failed to execute config")
 		}
 		return c.JSON(http.StatusOK, res)
@@ -52,12 +53,12 @@ func sessionHandle(c echo.Context) error {
 		var steps []config.Step
 		err = mapstructure.Decode(v, &steps)
 		if err != nil {
-			slog.Error("failed to decode config array", slog.Any("err", err))
+			slog.Error("failed to decode config array", log.ErrVal(err))
 			return c.String(http.StatusBadRequest, "invalid config array format")
 		}
 		res, err := sess.Handle(steps...)
 		if err != nil {
-			slog.Error("failed to execute config steps", slog.Any("err", err))
+			slog.Error("failed to execute config steps", log.ErrVal(err))
 			return c.String(http.StatusBadRequest, "failed to execute config steps")
 		}
 		return c.JSON(http.StatusOK, res)

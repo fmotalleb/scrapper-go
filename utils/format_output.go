@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log/slog"
 
+	"github.com/fmotalleb/scrapper-go/log"
 	"gopkg.in/yaml.v3"
 )
 
@@ -21,7 +22,7 @@ func (f Output) Format(data map[string]any) (string, error) {
 	case yamlFmt:
 		result, err := yaml.Marshal(data)
 		if err != nil {
-			slog.Error("Failed to marshal YAML", slog.Any("err", err))
+			slog.Error("Failed to marshal YAML", log.ErrVal(err))
 			return "", err
 		}
 		slog.Debug("Successfully formatted data as YAML")
@@ -30,7 +31,7 @@ func (f Output) Format(data map[string]any) (string, error) {
 	case jsonFmt:
 		result, err := json.MarshalIndent(data, "", "  ")
 		if err != nil {
-			slog.Error("Failed to marshal JSON", slog.Any("err", err))
+			slog.Error("Failed to marshal JSON", log.ErrVal(err))
 			return "", err
 		}
 		slog.Debug("Successfully formatted data as JSON")

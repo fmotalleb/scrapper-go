@@ -5,6 +5,7 @@ import (
 	"log/slog"
 
 	"github.com/fmotalleb/scrapper-go/config"
+	"github.com/fmotalleb/scrapper-go/log"
 	"github.com/fmotalleb/scrapper-go/utils"
 	"github.com/playwright-community/playwright-go"
 )
@@ -34,14 +35,14 @@ func (c *click) Execute(page playwright.Page, vars utils.Vars, result map[string
 	// Evaluate locator using template
 	locator, err := utils.EvaluateTemplate(c.locator, vars, page)
 	if err != nil {
-		slog.Error("failed to evaluate locator template", slog.Any("locator", c.locator), slog.Any("error", err))
+		slog.Error("failed to evaluate locator template", slog.Any("locator", c.locator), log.ErrVal(err))
 		return nil, err
 	}
 
 	// Perform click on the locator
 	err = page.Locator(locator).Click(c.params)
 	if err != nil {
-		slog.Error("failed to click on locator", slog.Any("locator", locator), slog.Any("params", c.params), slog.Any("error", err))
+		slog.Error("failed to click on locator", slog.Any("locator", locator), slog.Any("params", c.params), log.ErrVal(err))
 	}
 	return nil, err
 }
@@ -61,7 +62,7 @@ func buildClick(step config.Step) (Step, error) {
 	// Load additional parameters
 	r.params = playwright.LocatorClickOptions{}
 	if params, err := utils.LoadParams[playwright.LocatorClickOptions](step); err != nil {
-		slog.Error("failed to load parameters for click", slog.Any("err", err), slog.Any("step", step))
+		slog.Error("failed to load parameters for click", log.ErrVal(err), slog.Any("step", step))
 		return nil, err
 	} else {
 		r.params = *params

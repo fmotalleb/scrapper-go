@@ -5,6 +5,7 @@ import (
 	"log/slog"
 
 	"github.com/fmotalleb/scrapper-go/config"
+	"github.com/fmotalleb/scrapper-go/log"
 	"github.com/fmotalleb/scrapper-go/utils"
 	"github.com/playwright-community/playwright-go"
 )
@@ -33,7 +34,7 @@ func (c *omit) Execute(page playwright.Page, vars utils.Vars, result map[string]
 	// Evaluate locator using template
 	variable, err := utils.EvaluateTemplate(c.variable, vars, page)
 	if err != nil {
-		slog.Error("failed to evaluate locator template", slog.Any("variable", c.variable), slog.Any("error", err))
+		slog.Error("failed to evaluate locator template", slog.Any("variable", c.variable), log.ErrVal(err))
 		return nil, err
 	}
 	delete(vars, variable)

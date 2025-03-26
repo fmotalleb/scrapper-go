@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"strings"
 
+	"github.com/fmotalleb/scrapper-go/log"
 	"github.com/rivo/tview"
 )
 
@@ -32,7 +33,7 @@ func buildInput() (*tview.Flex, <-chan map[string]any) {
 		text := inputBox.GetText()
 		slog.Info("parsing", slog.String("query", text))
 		if res, err := parseJSONToMap(text); err != nil {
-			slog.Error("failed to parse query", slog.Any("error", err))
+			slog.Error("failed to parse query", log.ErrVal(err))
 		} else {
 			inputBox.SetText("", true)
 			queryChannel <- res
@@ -55,7 +56,7 @@ func parseJSONToMap(text string) (map[string]any, error) {
 	text = strings.ReplaceAll(text, `\"`, `"`)
 	err := json.Unmarshal([]byte(text), &result)
 	if err != nil {
-		slog.Error("Error parsing JSON:", slog.Any("error", err))
+		slog.Error("Error parsing JSON:", log.ErrVal(err))
 		return nil, err
 	}
 	return result, nil

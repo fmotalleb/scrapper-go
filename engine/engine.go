@@ -10,6 +10,7 @@ import (
 	"github.com/fmotalleb/scrapper-go/config"
 	"github.com/fmotalleb/scrapper-go/engine/middlewares"
 	"github.com/fmotalleb/scrapper-go/engine/steps"
+	"github.com/fmotalleb/scrapper-go/log"
 	"github.com/playwright-community/playwright-go"
 )
 
@@ -18,7 +19,7 @@ func ExecuteConfig(ctx context.Context, config config.ExecutionConfig) (map[stri
 	// Initialize Variables
 	vars, err := initializeVariables(config.Pipeline.Vars)
 	if err != nil {
-		slog.Error("failed to load variables", slog.Any("err", err))
+		slog.Error("failed to load variables", log.ErrVal(err))
 		return nil, fmt.Errorf("preflight check failed: %w", err)
 	}
 	if len(config.Pipeline.Steps) == 0 {
@@ -28,12 +29,12 @@ func ExecuteConfig(ctx context.Context, config config.ExecutionConfig) (map[stri
 	// Start Playwright
 	pw, err := playwright.Run()
 	if err != nil {
-		slog.Error("could not start Playwright", slog.Any("err", err))
+		slog.Error("could not start Playwright", log.ErrVal(err))
 		return nil, fmt.Errorf("playwright startup failed: %w", err)
 	}
 	defer func() {
 		if err := pw.Stop(); err != nil {
-			slog.Warn("failed to stop Playwright session", slog.Any("err", err))
+			slog.Warn("failed to stop Playwright session", log.ErrVal(err))
 		}
 	}()
 
@@ -45,12 +46,12 @@ func ExecuteConfig(ctx context.Context, config config.ExecutionConfig) (map[stri
 	// Launch Browser
 	browser, err := launchBrowser(pw, config.Pipeline.Browser, config.Pipeline.BrowserParams)
 	if err != nil {
-		slog.Error("could not launch browser", slog.Any("err", err))
+		slog.Error("could not launch browser", log.ErrVal(err))
 		return nil, err
 	}
 	defer func() {
 		if err := browser.Close(); err != nil {
-			slog.Error("failed to close browser", slog.Any("err", err))
+			slog.Error("failed to close browser", log.ErrVal(err))
 		}
 	}()
 
@@ -60,7 +61,7 @@ func ExecuteConfig(ctx context.Context, config config.ExecutionConfig) (map[stri
 	// Create Page
 	page, err := browser.NewPage(config.Pipeline.BrowserOptions)
 	if err != nil {
-		slog.Error("could not create page", slog.Any("err", err))
+		slog.Error("could not create page", log.ErrVal(err))
 		return nil, fmt.Errorf("page creation failed: %w", err)
 	}
 
@@ -85,14 +86,14 @@ func ExecuteConfig(ctx context.Context, config config.ExecutionConfig) (map[stri
 func ExecuteStream(ctx context.Context, config config.ExecutionConfig, pipeline <-chan []config.Step) (<-chan map[string]any, error) {
 	vars, err := initializeVariables(config.Pipeline.Vars)
 	if err != nil {
-		slog.Error("failed to load variables", slog.Any("err", err))
+		slog.Error("failed to load variables", log.ErrVal(err))
 		return nil, fmt.Errorf("preflight check failed: %w", err)
 	}
 
 	// Start Playwright
 	pw, err := playwright.Run()
 	if err != nil {
-		slog.Error("could not start Playwright", slog.Any("err", err))
+		slog.Error("could not start Playwright", log.ErrVal(err))
 		return nil, fmt.Errorf("playwright startup failed: %w", err)
 	}
 
@@ -104,7 +105,7 @@ func ExecuteStream(ctx context.Context, config config.ExecutionConfig, pipeline 
 	// Launch Browser
 	browser, err := launchBrowser(pw, config.Pipeline.Browser, config.Pipeline.BrowserParams)
 	if err != nil {
-		slog.Error("could not launch browser", slog.Any("err", err))
+		slog.Error("could not launch browser", log.ErrVal(err))
 		return nil, err
 	}
 
@@ -114,7 +115,7 @@ func ExecuteStream(ctx context.Context, config config.ExecutionConfig, pipeline 
 	// Create Page
 	page, err := browser.NewPage(config.Pipeline.BrowserOptions)
 	if err != nil {
-		slog.Error("could not create page", slog.Any("err", err))
+		slog.Error("could not create page", log.ErrVal(err))
 		return nil, fmt.Errorf("page creation failed: %w", err)
 	}
 
@@ -170,7 +171,7 @@ func handleKeepRunning(durationStr string) {
 
 	sleepTime, err := time.ParseDuration(durationStr)
 	if err != nil {
-		slog.Error("Invalid KeepRunning duration", slog.String("input", durationStr), slog.Any("err", err))
+		slog.Error("Invalid KeepRunning duration", slog.String("input", durationStr), log.ErrVal(err))
 		return
 	}
 

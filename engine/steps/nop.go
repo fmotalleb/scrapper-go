@@ -5,6 +5,7 @@ import (
 	"log/slog"
 
 	"github.com/fmotalleb/scrapper-go/config"
+	"github.com/fmotalleb/scrapper-go/log"
 	"github.com/fmotalleb/scrapper-go/utils"
 	"github.com/playwright-community/playwright-go"
 )
@@ -34,7 +35,7 @@ func (g *nop) Execute(p playwright.Page, vars utils.Vars, result map[string]any)
 	// Evaluate the URL template with the given variables
 	text, err := utils.EvaluateTemplate(g.text, vars, p)
 	if err != nil {
-		slog.Error("failed to evaluate URL template", slog.String("url", g.text), slog.Any("error", err))
+		slog.Error("failed to evaluate URL template", slog.String("url", g.text), log.ErrVal(err))
 		return nil, err
 	}
 

@@ -8,6 +8,7 @@ import (
 
 	"github.com/fmotalleb/scrapper-go/config"
 	"github.com/fmotalleb/scrapper-go/engine"
+	"github.com/fmotalleb/scrapper-go/log"
 	"github.com/mitchellh/mapstructure"
 )
 
@@ -18,7 +19,7 @@ func bindToBrowser(ctx context.Context, recvChan <-chan map[string]any) <-chan m
 	var cfg config.ExecutionConfig
 	err := mapstructure.Decode(cfgMap, &cfg)
 	if err != nil {
-		slog.Error("failed to read config from body", slog.Any("err", err))
+		slog.Error("failed to read config from body", log.ErrVal(err))
 		time.Sleep(time.Second * 5)
 		os.Exit(1)
 	}
@@ -35,7 +36,7 @@ func bindToBrowser(ctx context.Context, recvChan <-chan map[string]any) <-chan m
 			var cfg config.Step
 			err = mapstructure.Decode(i, &cfg)
 			if err != nil {
-				slog.Error("failed to read config from body", slog.Any("err", err))
+				slog.Error("failed to read config from body", log.ErrVal(err))
 				sendChan <- map[string]any{
 					"error": err.Error(),
 				}

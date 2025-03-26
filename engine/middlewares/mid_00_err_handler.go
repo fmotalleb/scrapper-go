@@ -4,6 +4,7 @@ import (
 	"log/slog"
 
 	"github.com/fmotalleb/scrapper-go/engine/steps"
+	"github.com/fmotalleb/scrapper-go/log"
 	"github.com/fmotalleb/scrapper-go/utils"
 	playwright "github.com/playwright-community/playwright-go"
 )
@@ -29,7 +30,7 @@ func errorHandler(p playwright.Page, s steps.Step, v utils.Vars, r map[string]an
 		case "ignore":
 			return nil
 		case "print":
-			slog.Error("error discarded but displayed due to on-error: print", slog.Any("error", err), slog.Any("step", s.GetConfig()))
+			slog.Error("error discarded but displayed due to on-error: print", log.ErrVal(err), slog.Any("step", s.GetConfig()))
 			return nil
 		case "panic":
 			panic(err)

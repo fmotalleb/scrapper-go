@@ -5,6 +5,7 @@ import (
 	"log/slog"
 
 	"github.com/fmotalleb/scrapper-go/config"
+	"github.com/fmotalleb/scrapper-go/log"
 	"github.com/fmotalleb/scrapper-go/utils"
 	"github.com/playwright-community/playwright-go"
 )
@@ -35,13 +36,13 @@ func (e *eval) Execute(page playwright.Page, vars utils.Vars, result map[string]
 	// Evaluate locator and JS code templates
 	locator, err := utils.EvaluateTemplate(e.locator, vars, page)
 	if err != nil {
-		slog.Error("failed to evaluate locator template", slog.Any("locator", e.locator), slog.Any("error", err))
+		slog.Error("failed to evaluate locator template", slog.Any("locator", e.locator), log.ErrVal(err))
 		return nil, err
 	}
 
 	jsCode, err := utils.EvaluateTemplate(e.jsCode, vars, page)
 	if err != nil {
-		slog.Error("failed to evaluate JS code template", slog.Any("jsCode", e.jsCode), slog.Any("error", err))
+		slog.Error("failed to evaluate JS code template", slog.Any("jsCode", e.jsCode), log.ErrVal(err))
 		return nil, err
 	}
 
@@ -56,7 +57,7 @@ func (e *eval) Execute(page playwright.Page, vars utils.Vars, result map[string]
 	}
 
 	if err != nil {
-		slog.Error("failed to evaluate JS code", slog.Any("error", err))
+		slog.Error("failed to evaluate JS code", log.ErrVal(err))
 	}
 	return r, err
 }
@@ -82,7 +83,7 @@ func buildEval(step config.Step) (Step, error) {
 	// Load additional parameters
 	r.params = playwright.LocatorEvaluateOptions{}
 	if params, err := utils.LoadParams[playwright.LocatorEvaluateOptions](step); err != nil {
-		slog.Error("failed to load parameters for eval", slog.Any("error", err), slog.Any("step", step))
+		slog.Error("failed to load parameters for eval", log.ErrVal(err), slog.Any("step", step))
 		return nil, err
 	} else {
 		r.params = *params
