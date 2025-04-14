@@ -1,6 +1,7 @@
 module github.com/fmotalleb/scrapper-go
 
 go 1.24.0
+
 require (
 	github.com/PuerkitoBio/goquery v1.10.2
 	github.com/client9/misspell v0.3.4
@@ -11,7 +12,7 @@ require (
 	github.com/gorilla/websocket v1.5.3
 	github.com/labstack/echo/v4 v4.13.3
 	github.com/mitchellh/mapstructure v1.5.0
-	github.com/playwright-community/playwright-go v0.5001.0
+	github.com/playwright-community/playwright-go v0.5101.0
 	github.com/rivo/tview v0.0.0-20241227133733-17b7edb88c57
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/viper v1.20.1
