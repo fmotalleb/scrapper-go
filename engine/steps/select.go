@@ -48,29 +48,28 @@ func (s *selectStep) Execute(page playwright.Page, vars utils.Vars, result map[s
 
 	// Consolidate the template evaluation and assignment
 	// Evaluating and setting values or labels
-	setValuesOrLabels := func(fieldName string, target *[]string) error {
-		values, err := utils.EvaluateTemplates(*target, vars, page)
+	setValuesOrLabels := func(fieldName string, source []string) (*[]string, error) {
+		values, err := utils.EvaluateTemplates(source, vars, page)
 		if err != nil {
-			slog.Error(fmt.Sprintf("failed to execute template on %s", fieldName), log.ErrVal(err), slog.Any(fieldName, *target))
-			return err
+			slog.Error(fmt.Sprintf("failed to execute template on %s", fieldName), log.ErrVal(err), slog.Any(fieldName, source))
+			return nil, err
 		}
-		*target = values
-		return nil
+		return &values, nil
 	}
 
 	// Evaluate all options for select
-	if err := setValuesOrLabels("values", &s.values); err != nil {
+	if selectOpt.Values, err = setValuesOrLabels("values", s.values); err != nil {
 		return nil, err
 	}
-	if err := setValuesOrLabels("values_or_labels", &s.valuesOrLabels); err != nil {
+	if selectOpt.ValuesOrLabels, err = setValuesOrLabels("values_or_labels", s.valuesOrLabels); err != nil {
 		return nil, err
 	}
-	if err := setValuesOrLabels("labels", &s.labels); err != nil {
+	if selectOpt.Labels, err = setValuesOrLabels("labels", s.labels); err != nil {
 		return nil, err
 	}
-	if err := setValuesOrLabels("indexes", &s.indexes); err != nil {
-		return nil, err
-	}
+	// if err := setValuesOrLabels("indexes", s.indexes, selectOpt.Indexes); err != nil {
+	// 	return nil, err
+	// }
 
 	// Convert index strings to integers
 	if values, err := utils.EvaluateTemplates(s.indexes, vars, page); err == nil {
