@@ -31,8 +31,18 @@ func exec(p playwright.Page, s steps.Step, v utils.Vars, r map[string]any, next 
 		if !valid {
 			return fmt.Errorf("expected set-var to be a string, got: %T", key)
 		}
-		r[strKey] = result
-		slog.Debug("stored result in set-var", slog.String("key", strKey), slog.Any("value", result))
+		if existing, ok := r[strKey]; ok {
+			if existingSlice, valid := existing.([]string); valid {
+				// If it's a valid slice, append the new result
+				r[strKey] = append(existingSlice, fmt.Sprintf("%v", result))
+			} else {
+				return fmt.Errorf("existing key '%s' is not of type []string", strKey)
+			}
+		} else {
+			// Key does not exist, create a new slice
+			r[strKey] = []string{fmt.Sprintf("%v", result)}
+		}
+		slog.Debug("stored result in set-var", slog.String("key", strKey), slog.Any("value", r[strKey]))
 	}
 
 	return nil
