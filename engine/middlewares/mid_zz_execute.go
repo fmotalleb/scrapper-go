@@ -35,7 +35,11 @@ func exec(p playwright.Page, s steps.Step, v utils.Vars, r map[string]any, next 
 		if existing, ok := r[strKey]; ok {
 			if existingSlice, valid := existing.([]string); valid {
 				// If it's a valid slice, append the new result
-				r[strKey] = append(existingSlice, fmt.Sprintf("%v", result))
+				result, err := json.Marshal(result)
+				if err != nil {
+					return err
+				}
+				r[strKey] = append(existingSlice, string(result))
 			} else {
 				return fmt.Errorf("existing key '%s' is not of type []string", strKey)
 			}
