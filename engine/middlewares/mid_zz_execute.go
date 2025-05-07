@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"encoding/json"
 	"fmt"
 	"log/slog"
 
@@ -39,8 +40,12 @@ func exec(p playwright.Page, s steps.Step, v utils.Vars, r map[string]any, next 
 				return fmt.Errorf("existing key '%s' is not of type []string", strKey)
 			}
 		} else {
+			result, err := json.Marshal(result)
+			if err != nil {
+				return err
+			}
 			// Key does not exist, create a new slice
-			r[strKey] = []string{fmt.Sprintf("%v", result)}
+			r[strKey] = []string{string(result)}
 		}
 		slog.Debug("stored result in set-var", slog.String("key", strKey), slog.Any("value", r[strKey]))
 	}

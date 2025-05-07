@@ -1,7 +1,7 @@
 package steps
 
 import (
-	"fmt"
+	"errors"
 	"log/slog"
 
 	"github.com/fmotalleb/scrapper-go/config"
@@ -14,16 +14,17 @@ func init() {
 	stepSelectors = append(stepSelectors, stepSelector{
 		CanHandle: func(s config.Step) bool {
 			_, ok := s["nop"].(string)
-			return ok
+			// This enables the branching capabilities like for-loops
+			_, steps := s["loop"].(string)
+			return ok || steps
 		},
 		Generator: buildNop,
 	})
 }
 
 type nop struct {
-	text   string
-	params playwright.PageGotoOptions
-	conf   config.Step
+	text string
+	conf config.Step
 }
 
 func (s *nop) GetConfig() config.Step {
@@ -43,20 +44,14 @@ func (g *nop) Execute(p playwright.Page, vars utils.Vars, result map[string]any)
 }
 
 func buildNop(step config.Step) (Step, error) {
-	r := new(gotoStep)
+	r := new(nop)
 	r.conf = step
 	// Extract the URL from the step
 	var ok bool
-	if r.url, ok = step["nop"].(string); !ok {
-		return nil, fmt.Errorf("nop must have a string field, got: %v", step)
-	}
-
-	// Load additional parameters
-	r.params = playwright.PageGotoOptions{}
-	if params, err := utils.LoadParams[playwright.PageGotoOptions](step); err != nil {
-		return nil, err
-	} else {
-		r.params = *params
+	if r.text, ok = step["nop"].(string); !ok {
+		if r.text, ok = step["loop"].(string); !ok {
+			return nil, errors.New("field to build nop node")
+		}
 	}
 
 	return r, nil

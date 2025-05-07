@@ -29,8 +29,8 @@ func BuildSteps(steps []config.Step) ([]Step, error) {
 
 		// Log failure if no selector could handle the step
 		if !handled {
-			slog.Error("failed to handle step", slog.Any("step", step))
-			return nil, fmt.Errorf("failed to handle step: %v", step)
+			slog.Error("no handler found for step", slog.Any("step", step))
+			return nil, fmt.Errorf("no handler found for step: %v", step)
 		}
 	}
 
