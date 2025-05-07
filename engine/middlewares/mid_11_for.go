@@ -25,14 +25,18 @@ func forLoop(p playwright.Page, s steps.Step, v utils.Vars, r map[string]any, ne
 	}
 
 	var cond string
+	var ok bool
 	if raw, ok := s.GetConfig()["loop"]; !ok {
 		return next(p, s, v, r)
 	} else {
-		var ok bool
 		if cond, ok = raw.(string); !ok {
 			slog.Error("loop condition found but was unable to read it as an string")
 			return errors.New("")
 		}
+	}
+	var loopKey string
+	if loopKey, ok = s.GetConfig()["loop-key"].(string); !ok {
+		loopKey = "item"
 	}
 	var nextSteps []steps.Step
 
@@ -72,7 +76,7 @@ func forLoop(p playwright.Page, s steps.Step, v utils.Vars, r map[string]any, ne
 		return err
 	}
 	for _, i := range items {
-		v.SetOnce("item", i)
+		v.SetOnce(loopKey, i)
 		for _, step := range nextSteps {
 			if err := HandleStep(p, step, v, r); err != nil {
 				return err

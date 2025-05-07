@@ -4,9 +4,24 @@ pipeline:
   browser_params:
     headless: false
   steps:
-    - goto: https://tools.admin.dornicafile.ir/test.html
-    - element: table
-      mode: table
-      set-var: result
-    - screenshot: body
-      set-var: scr
+    - goto: http://80.191.255.65/
+    - click: "#ContentPlaceHolder1_rbIsAddress"
+    - loop: "[1,990090345]"
+      steps:
+        - select: "#ContentPlaceHolder1_ddlCity"
+          values: "{{ item }}"
+          on-error: ignore
+        - sleep: 1s
+        - loop: "100"
+          on-error: ignore
+          steps:
+            - select: "#ContentPlaceHolder1_ddlArea"
+              values: "{{ item }}"
+              on-error: ignore
+              params:
+                timeout: 1500
+            - click: "#ContentPlaceHolder1_btnSearchOutage"
+            - element: "#ContentPlaceHolder1_grdOutages"
+              on-error: ignore
+              mode: table
+              set-var: result
