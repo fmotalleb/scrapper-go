@@ -1,3 +1,4 @@
+// Package steps contains parser and executor of each step
 package steps
 
 import (
