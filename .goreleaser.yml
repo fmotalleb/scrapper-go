@@ -1,24 +1,76 @@
+version: 2
+
 before:
   hooks:
     - go mod download
+    - go generate ./...
 builds:
-  - env:
+  - id: default
+    env:
       - CGO_ENABLED=0
+    ldflags:
+      - "-s"
+      - "-w"
+      - "-X github.com/FMotalleb/go-tools/git.Version={{.Version}}"
+      - "-X github.com/FMotalleb/go-tools/git.Commit={{.ShortCommit}}"
+      - "-X github.com/FMotalleb/go-tools/git.Date={{.Date}}"
+      - "-X github.com/FMotalleb/go-tools/git.Branch={{.Branch}}"
     goos:
       - darwin
       - linux
       - windows
+    tags:
+      - with_utls
     goarch:
       - amd64
+
+  - id: slim
+    env:
+      - CGO_ENABLED=0
+    tags:
+      - with_utls
+    ldflags:
+      - "-s"
+      - "-w"
+      - "-X github.com/FMotalleb/go-tools/git.Version={{.Version}}"
+      - "-X github.com/FMotalleb/go-tools/git.Commit={{.ShortCommit}}"
+      - "-X github.com/FMotalleb/go-tools/git.Date={{.Date}}"
+      - "-X github.com/FMotalleb/go-tools/git.Branch={{.Branch}}"
+    goos:
+      - linux
+    goarch:
+      - amd64
+    binary: scrapper-go
+    skip: "archive"
+
+dockers:
+  - image_templates:
+      - "ghcr.io/fmotalleb/scrapper-go:{{ .Version }}-distroless"
+      - "ghcr.io/fmotalleb/scrapper-go:latest-distroless"
+      - "ghcr.io/fmotalleb/scrapper-go:latest"
+    dockerfile: Dockerfile
+    goos: linux
+    goarch: amd64
+    ids:
+      - slim
+    extra_files:
+      - docker
+    build_flag_templates:
+      - "--target=distroless"
+    use: buildx
+
 archives:
-  - format_overrides:
-      - goos: windows
-        format: zip
+  - id: default
+    builds:
+      - default
 
 release:
   github:
+    owner: FMotalleb
+    name: scrapper-go
   name_template: "{{.Version}}"
   prerelease: auto
   mode: append
+
 changelog:
-  skip: true
+  disable: true

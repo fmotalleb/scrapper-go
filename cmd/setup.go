@@ -17,9 +17,7 @@ type setupArgs struct {
 	dryRun              bool
 }
 
-var (
-	setupArg setupArgs
-)
+var setupArg setupArgs
 
 // setupCmd represents the setup command
 var setupCmd = &cobra.Command{

@@ -20,7 +20,7 @@ EOF
 USER scrapper
 
 
-COPY --from=builder /app/scrapper-go /usr/bin/scrapper-go
+COPY scrapper-go /usr/bin/scrapper-go
 
 RUN /usr/bin/scrapper-go setup
 

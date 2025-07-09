@@ -13,7 +13,6 @@ import (
 )
 
 func bindToBrowser(ctx context.Context, recvChan <-chan map[string]any) <-chan map[string]any {
-
 	cfgMap := <-recvChan
 
 	var cfg config.ExecutionConfig

@@ -18,9 +18,7 @@ type serveArgs struct {
 	port    uint32
 }
 
-var (
-	serverArg serveArgs
-)
+var serverArg serveArgs
 
 // serveCmd represents the serve command
 var serveCmd = &cobra.Command{

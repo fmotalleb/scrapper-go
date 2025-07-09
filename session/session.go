@@ -29,9 +29,7 @@ type SessionStore struct {
 	sessions map[string]*Session
 }
 
-var (
-	store = &SessionStore{sessions: make(map[string]*Session)}
-)
+var store = &SessionStore{sessions: make(map[string]*Session)}
 
 func NewSession(cfg config.ExecutionConfig, timeout time.Duration) (*Session, error) {
 	ctx := context.Background()
@@ -69,12 +67,13 @@ func GetSessions() []string {
 	defer store.mutex.Unlock()
 	result := make([]string, len(store.sessions))
 	index := 0
-	for id, _ := range store.sessions {
+	for id := range store.sessions {
 		result[index] = id
 		index++
 	}
 	return result
 }
+
 func GetSession(id string) (*Session, bool) {
 	store.mutex.Lock()
 	defer store.mutex.Unlock()

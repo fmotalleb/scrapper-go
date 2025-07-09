@@ -21,6 +21,7 @@ func init() {
 		},
 	)
 }
+
 func sessionHandle(c echo.Context) error {
 	id := c.Param("id")
 	slog.Info("session handle requested", slog.String("id", id))

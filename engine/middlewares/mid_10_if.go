@@ -51,7 +51,6 @@ func conditionCheck(p playwright.Page, s steps.Step, v utils.Vars, r map[string]
 				return q.EvaluateQuery(v.Snapshot())
 			},
 		})
-
 	if err != nil {
 		switch err {
 		case errNoIf:
