@@ -79,7 +79,6 @@ chmod +x "$WORKING_DIR/scrapper-go"
 echo -e "${GREEN}Installation complete.${NC}"
 echo -e "${BOLD}Run: ${NC}${YELLOW}./scrapper-go --help${NC}"
 echo
-echo -e "${BOLD}To see example config:${NC} ${YELLOW}./scrapper-go example${NC}"
 echo -e "${BOLD}To install globally:${NC} ${YELLOW}sudo mv ./scrapper-go /usr/local/bin/scrapper-go${NC}"
 echo
 echo -e "${BLUE}Temporary files are in:${NC} ${TMPDIR}"
