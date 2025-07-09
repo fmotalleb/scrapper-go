@@ -45,18 +45,13 @@ builds:
 
 dockers:
   - image_templates:
-      - "ghcr.io/fmotalleb/scrapper-go:{{ .Version }}-distroless"
-      - "ghcr.io/fmotalleb/scrapper-go:latest-distroless"
+      - "ghcr.io/fmotalleb/scrapper-go:{{ .Version }}"
       - "ghcr.io/fmotalleb/scrapper-go:latest"
     dockerfile: Dockerfile
     goos: linux
     goarch: amd64
     ids:
       - slim
-    extra_files:
-      - docker
-    build_flag_templates:
-      - "--target=distroless"
     use: buildx
 
 archives:
