@@ -9,6 +9,7 @@ tool (
 )
 
 require (
+	github.com/FMotalleb/go-tools v0.1.26
 	github.com/PuerkitoBio/goquery v1.10.3
 	github.com/gdamore/tcell/v2 v2.8.1
 	github.com/google/uuid v1.6.0

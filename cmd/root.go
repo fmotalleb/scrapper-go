@@ -23,6 +23,7 @@ import (
 	"log/slog"
 	"os"
 
+	"github.com/FMotalleb/go-tools/git"
 	"github.com/fmotalleb/scrapper-go/config"
 	"github.com/fmotalleb/scrapper-go/engine"
 	"github.com/fmotalleb/scrapper-go/log"
@@ -40,8 +41,9 @@ var (
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "scrapper-go",
-	Short: "A Simple playwright wrapper that executes a simple yaml pipeline",
+	Use:     "scrapper-go",
+	Short:   "A Simple playwright wrapper that executes a simple yaml pipeline",
+	Version: git.String(),
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		if err := log.SetupLogger(logLevel); err != nil {
 			slog.Error("failed to set log level", log.ErrVal(err))
