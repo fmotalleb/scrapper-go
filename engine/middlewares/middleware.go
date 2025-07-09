@@ -1,3 +1,5 @@
+// Package middlewares holds the workflow of which every step need to be executed
+// Files are named ordered as they will register themselves
 package middlewares
 
 import (

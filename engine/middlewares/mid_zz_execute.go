@@ -1,7 +1,6 @@
 package middlewares
 
 import (
-	"encoding/json"
 	"fmt"
 	"log/slog"
 
@@ -32,26 +31,43 @@ func exec(p playwright.Page, s steps.Step, v utils.Vars, r map[string]any, next 
 		if !valid {
 			return fmt.Errorf("expected set-var to be a string, got: %T", key)
 		}
-		if existing, ok := r[strKey]; ok {
-			if existingSlice, valid := existing.([]string); valid {
-				// If it's a valid slice, append the new result
-				result, err := json.Marshal(result)
-				if err != nil {
-					return err
-				}
-				r[strKey] = append(existingSlice, string(result))
-			} else {
-				return fmt.Errorf("existing key '%s' is not of type []string", strKey)
-			}
+		if err := setOrAppendWithMeta(r, strKey, result); err != nil {
+			slog.Error("failed to store data in variable",
+				slog.String("key", strKey),
+				slog.Any("value", result),
+				slog.Any("table", result),
+				log.ErrVal(err),
+			)
 		} else {
-			result, err := json.Marshal(result)
-			if err != nil {
-				return err
-			}
-			// Key does not exist, create a new slice
-			r[strKey] = []string{string(result)}
+			slog.Debug("stored result in set-var", slog.String("key", strKey), slog.Any("value", r[strKey]))
 		}
-		slog.Debug("stored result in set-var", slog.String("key", strKey), slog.Any("value", r[strKey]))
+	}
+	return nil
+}
+
+func setOrAppendWithMeta(r map[string]any, key string, value any) error {
+	metaKey := "__$" + key
+	var isFirstTime bool
+	var hasMeta bool
+	if isFirstTime, hasMeta = r[metaKey].(bool); !hasMeta {
+		// No meta field: set value as-is
+		r[key] = value
+		r[metaKey] = true
+		return nil
+	}
+	existing := r[key]
+	if isFirstTime {
+		r[metaKey] = false
+		r[key] = []any{existing, value}
+		return nil
+	}
+
+	switch v := existing.(type) {
+	case []any:
+		// Already a slice
+		r[key] = append(v, value)
+	default:
+		return fmt.Errorf("unsupported type for key '%s': %T", key, existing)
 	}
 
 	return nil

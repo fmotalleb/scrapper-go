@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"strings"
 	"time"
 
 	"github.com/fmotalleb/scrapper-go/config"
@@ -78,9 +79,14 @@ func ExecuteConfig(ctx context.Context, config config.ExecutionConfig) (map[stri
 			return nil, err
 		}
 	}
-
-	slog.Info("Execution finished", slog.Any("vars_snapshot", vars.Snapshot()), slog.Any("result", result))
-	return result, nil
+	out := make(map[string]any, len(result)/2)
+	for k, v := range result {
+		if !strings.HasPrefix(k, "__$") {
+			out[k] = v
+		}
+	}
+	slog.Info("Execution finished", slog.Any("vars_snapshot", vars.Snapshot()), slog.Any("result", out))
+	return out, nil
 }
 
 func ExecuteStream(ctx context.Context, config config.ExecutionConfig, pipeline <-chan []config.Step) (<-chan map[string]any, error) {
@@ -135,7 +141,13 @@ func ExecuteStream(ctx context.Context, config config.ExecutionConfig, pipeline 
 					continue
 				}
 			}
-			resultChan <- result
+			out := make(map[string]any, len(result)/2)
+			for k, v := range result {
+				if !strings.HasPrefix(k, "__$") {
+					out[k] = v
+				}
+			}
+			resultChan <- out
 		}
 	}()
 
