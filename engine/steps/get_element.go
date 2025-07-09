@@ -23,19 +23,19 @@ func init() {
 }
 
 const (
-	GET_HTML       = getTextMode("html")
-	GET_VALUE      = getTextMode("value")
-	GET_TEXT       = getTextMode("text")
-	GET_TABLE      = getTextMode("table")
-	GET_TABLE_FLAT = getTextMode("table-flat")
+	ReadTypeHTML      = getTextMode("html")
+	ReadTypeValue     = getTextMode("value")
+	ReadTypeText      = getTextMode("text")
+	ReadTypeTable     = getTextMode("table")
+	ReadTypeTableFlat = getTextMode("table-flat")
 )
 
 var validModes = map[string]getTextMode{
-	"html":       GET_HTML,
-	"value":      GET_VALUE,
-	"text":       GET_TEXT,
-	"table":      GET_TABLE,
-	"table-flat": GET_TABLE_FLAT,
+	"html":       ReadTypeHTML,
+	"value":      ReadTypeValue,
+	"text":       ReadTypeText,
+	"table":      ReadTypeTable,
+	"table-flat": ReadTypeTableFlat,
 }
 
 type getText struct {
@@ -45,40 +45,40 @@ type getText struct {
 	conf    config.Step
 }
 
-func (s *getText) GetConfig() config.Step {
-	return s.conf
+func (ge *getText) GetConfig() config.Step {
+	return ge.conf
 }
 
 // Execute implements Step.
-func (g *getText) Execute(page playwright.Page, vars utils.Vars, result map[string]any) (interface{}, error) {
-	locator, err := utils.EvaluateTemplate(g.locator, vars, page)
+func (ge *getText) Execute(p playwright.Page, v utils.Vars, r map[string]any) (interface{}, error) {
+	locator, err := utils.EvaluateTemplate(ge.locator, v, p)
 	if err != nil {
-		slog.Error("failed to evaluate locator template", slog.String("locator", g.locator), log.ErrVal(err))
+		slog.Error("failed to evaluate locator template", slog.String("locator", ge.locator), log.ErrVal(err))
 		return nil, err
 	}
-	element := page.Locator(locator)
+	element := p.Locator(locator)
 	var output interface{}
 
-	slog.Debug("fetching element content", slog.String("locator", locator), slog.String("mode", string(g.mode)))
+	slog.Debug("fetching element content", slog.String("locator", locator), slog.String("mode", string(ge.mode)))
 
-	switch g.mode {
-	case GET_HTML:
+	switch ge.mode {
+	case ReadTypeHTML:
 		output, err = element.InnerHTML()
 
-	case GET_VALUE:
+	case ReadTypeValue:
 		output, err = element.InputValue()
 
-	case GET_TEXT:
+	case ReadTypeText:
 		output, err = element.TextContent()
 
-	case GET_TABLE:
+	case ReadTypeTable:
 		var body string
 		body, err = element.InnerHTML()
 		if err == nil {
 			output, err = utils.ParseTable(fmt.Sprintf("<table>%s</table>", body))
 		}
 
-	case GET_TABLE_FLAT:
+	case ReadTypeTableFlat:
 		var body string
 		body, err = element.InnerHTML()
 		if err == nil {
@@ -87,7 +87,7 @@ func (g *getText) Execute(page playwright.Page, vars utils.Vars, result map[stri
 	}
 
 	if err != nil {
-		slog.Error("failed to fetch content from element", slog.String("locator", locator), slog.String("mode", string(g.mode)), log.ErrVal(err))
+		slog.Error("failed to fetch content from element", slog.String("locator", locator), slog.String("mode", string(ge.mode)), log.ErrVal(err))
 	}
 	return output, err
 }
@@ -114,7 +114,7 @@ func buildElementSelector(step config.Step) (Step, error) {
 			return nil, err
 		}
 	} else {
-		r.mode = GET_HTML // Default mode if not provided
+		r.mode = ReadTypeHTML // Default mode if not provided
 	}
 
 	// Load optional parameters

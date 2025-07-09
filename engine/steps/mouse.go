@@ -39,36 +39,36 @@ type mouse struct {
 	conf config.Step
 }
 
-func (s *mouse) GetConfig() config.Step {
-	return s.conf
+func (mp *mouse) GetConfig() config.Step {
+	return mp.conf
 }
 
 // Execute implements Step.
-func (c *mouse) Execute(page playwright.Page, vars utils.Vars, result map[string]any) (interface{}, error) {
+func (mp *mouse) Execute(p playwright.Page, v utils.Vars, r map[string]any) (interface{}, error) {
 	// Evaluate locator using template
 	// locator, err := utils.EvaluateTemplate(c.location, vars, page)
 	// if err != nil {
 	// 	slog.Error("failed to evaluate locator template", slog.Any("locator", c.location), log.ErrVal(err))
 	// 	return nil, err
 	// }
-	switch c.action {
+	switch mp.action {
 	case mouseActionClick:
 
-		return nil, page.Mouse().Click(c.location[0], c.location[1])
+		return nil, p.Mouse().Click(mp.location[0], mp.location[1])
 
 	case mouseActionDoubleClick:
-		return nil, page.Mouse().Dblclick(c.location[0], c.location[1])
+		return nil, p.Mouse().Dblclick(mp.location[0], mp.location[1])
 	case mouseActionMove:
-		return nil, page.Mouse().Move(c.location[0], c.location[1])
+		return nil, p.Mouse().Move(mp.location[0], mp.location[1])
 	case mouseActionScroll:
-		return nil, page.Mouse().Wheel(c.location[0], c.location[1])
+		return nil, p.Mouse().Wheel(mp.location[0], mp.location[1])
 	case mouseActionDown:
-		return nil, page.Mouse().Down()
+		return nil, p.Mouse().Down()
 	case mouseActionUp:
-		return nil, page.Mouse().Up()
+		return nil, p.Mouse().Up()
 	}
 
-	return nil, fmt.Errorf("unknown mouse action: %s", c.action)
+	return nil, fmt.Errorf("unknown mouse action: %s", mp.action)
 }
 
 func buildMouse(step config.Step) (Step, error) {

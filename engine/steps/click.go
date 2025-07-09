@@ -26,23 +26,23 @@ type click struct {
 	conf    config.Step
 }
 
-func (s *click) GetConfig() config.Step {
-	return s.conf
+func (mc *click) GetConfig() config.Step {
+	return mc.conf
 }
 
 // Execute implements Step.
-func (c *click) Execute(page playwright.Page, vars utils.Vars, result map[string]any) (interface{}, error) {
+func (mc *click) Execute(p playwright.Page, v utils.Vars, r map[string]any) (interface{}, error) {
 	// Evaluate locator using template
-	locator, err := utils.EvaluateTemplate(c.locator, vars, page)
+	locator, err := utils.EvaluateTemplate(mc.locator, v, p)
 	if err != nil {
-		slog.Error("failed to evaluate locator template", slog.Any("locator", c.locator), log.ErrVal(err))
+		slog.Error("failed to evaluate locator template", slog.Any("locator", mc.locator), log.ErrVal(err))
 		return nil, err
 	}
 
 	// Perform click on the locator
-	err = page.Locator(locator).Click(c.params)
+	err = p.Locator(locator).Click(mc.params)
 	if err != nil {
-		slog.Error("failed to click on locator", slog.Any("locator", locator), slog.Any("params", c.params), log.ErrVal(err))
+		slog.Error("failed to click on locator", slog.Any("locator", locator), slog.Any("params", mc.params), log.ErrVal(err))
 	}
 	return nil, err
 }

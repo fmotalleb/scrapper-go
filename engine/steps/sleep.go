@@ -31,9 +31,9 @@ func (s *sleep) GetConfig() config.Step {
 }
 
 // Execute implements Step.
-func (s *sleep) Execute(page playwright.Page, vars utils.Vars, result map[string]any) (interface{}, error) {
+func (s *sleep) Execute(p playwright.Page, v utils.Vars, r map[string]any) (interface{}, error) {
 	// Evaluate the sleep duration template
-	waitTime, err := utils.EvaluateTemplate(s.sleep, vars, page)
+	waitTime, err := utils.EvaluateTemplate(s.sleep, v, p)
 	if err != nil {
 		return nil, err
 	}

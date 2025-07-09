@@ -26,16 +26,16 @@ type gotoStep struct {
 	conf   config.Step
 }
 
-func (s *gotoStep) GetConfig() config.Step {
-	return s.conf
+func (e *gotoStep) GetConfig() config.Step {
+	return e.conf
 }
 
 // Execute implements Step.
-func (g *gotoStep) Execute(p playwright.Page, vars utils.Vars, result map[string]any) (interface{}, error) {
+func (e *gotoStep) Execute(p playwright.Page, v utils.Vars, r map[string]any) (interface{}, error) {
 	// Evaluate the URL template with the given variables
-	url, err := utils.EvaluateTemplate(g.url, vars, p)
+	url, err := utils.EvaluateTemplate(e.url, v, p)
 	if err != nil {
-		slog.Error("failed to evaluate URL template", slog.String("url", g.url), log.ErrVal(err))
+		slog.Error("failed to evaluate URL template", slog.String("url", e.url), log.ErrVal(err))
 		return nil, err
 	}
 
@@ -48,7 +48,7 @@ func (g *gotoStep) Execute(p playwright.Page, vars utils.Vars, result map[string
 
 	slog.Debug("navigating to URL", slog.String("url", url))
 	// Navigate to the evaluated URL
-	return p.Goto(url, g.params)
+	return p.Goto(url, e.params)
 }
 
 func buildGoto(step config.Step) (Step, error) {

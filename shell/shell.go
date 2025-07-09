@@ -1,3 +1,4 @@
+// Package shell contains codebase for TUI
 package shell
 
 import (

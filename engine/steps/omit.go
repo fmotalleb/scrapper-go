@@ -25,20 +25,20 @@ type omit struct {
 	conf     config.Step
 }
 
-func (s *omit) GetConfig() config.Step {
-	return s.conf
+func (o *omit) GetConfig() config.Step {
+	return o.conf
 }
 
 // Execute implements Step.
-func (c *omit) Execute(page playwright.Page, vars utils.Vars, result map[string]any) (interface{}, error) {
+func (o *omit) Execute(p playwright.Page, v utils.Vars, r map[string]any) (interface{}, error) {
 	// Evaluate locator using template
-	variable, err := utils.EvaluateTemplate(c.variable, vars, page)
+	variable, err := utils.EvaluateTemplate(o.variable, v, p)
 	if err != nil {
-		slog.Error("failed to evaluate locator template", slog.Any("variable", c.variable), log.ErrVal(err))
+		slog.Error("failed to evaluate locator template", slog.Any("variable", o.variable), log.ErrVal(err))
 		return nil, err
 	}
-	delete(vars, variable)
-	delete(result, variable)
+	delete(v, variable)
+	delete(r, variable)
 	return nil, nil
 }
 

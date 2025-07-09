@@ -27,14 +27,14 @@ type screenShot struct {
 	conf    config.Step
 }
 
-func (s *screenShot) GetConfig() config.Step {
-	return s.conf
+func (sc *screenShot) GetConfig() config.Step {
+	return sc.conf
 }
 
 // Execute implements Step.
-func (sc *screenShot) Execute(page playwright.Page, vars utils.Vars, result map[string]any) (interface{}, error) {
+func (sc *screenShot) Execute(p playwright.Page, v utils.Vars, r map[string]any) (interface{}, error) {
 	// Evaluate the locator template
-	locator, err := utils.EvaluateTemplate(sc.locator, vars, page)
+	locator, err := utils.EvaluateTemplate(sc.locator, v, p)
 	if err != nil {
 		slog.Error("failed to evaluate locator template", slog.String("locator", sc.locator), log.ErrVal(err))
 		return nil, err
@@ -49,7 +49,7 @@ func (sc *screenShot) Execute(page playwright.Page, vars utils.Vars, result map[
 
 	// Take a screenshot of the element identified by the locator
 	slog.Debug("taking screenshot for locator", slog.String("locator", locator))
-	data, err := page.Locator(locator).Screenshot(sc.params)
+	data, err := p.Locator(locator).Screenshot(sc.params)
 	if err != nil {
 		slog.Error("failed to take screenshot", log.ErrVal(err))
 		return nil, err

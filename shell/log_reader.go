@@ -22,7 +22,7 @@ func createLogView() *tview.TextView {
 	}
 
 	// Setup the logger to write to the log view.
-	log.SetupLogger("DEBUG", logOutput)
+	_ = log.SetupLogger("DEBUG", logOutput)
 
 	return logBox
 }

@@ -14,7 +14,6 @@ func unShadow(data map[string]any, key string) map[string]any {
 		newKey := fmt.Sprintf("_%s", key)
 		data = unShadow(data, newKey)
 		data[newKey] = data[key]
-	} else {
 	}
 	return data
 }

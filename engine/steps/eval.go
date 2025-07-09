@@ -27,39 +27,39 @@ type eval struct {
 	conf    config.Step
 }
 
-func (s *eval) GetConfig() config.Step {
-	return s.conf
+func (ev *eval) GetConfig() config.Step {
+	return ev.conf
 }
 
 // Execute implements Step.
-func (e *eval) Execute(page playwright.Page, vars utils.Vars, result map[string]any) (interface{}, error) {
+func (ev *eval) Execute(p playwright.Page, v utils.Vars, r map[string]any) (interface{}, error) {
 	// Evaluate locator and JS code templates
-	locator, err := utils.EvaluateTemplate(e.locator, vars, page)
+	locator, err := utils.EvaluateTemplate(ev.locator, v, p)
 	if err != nil {
-		slog.Error("failed to evaluate locator template", slog.Any("locator", e.locator), log.ErrVal(err))
+		slog.Error("failed to evaluate locator template", slog.Any("locator", ev.locator), log.ErrVal(err))
 		return nil, err
 	}
 
-	jsCode, err := utils.EvaluateTemplate(e.jsCode, vars, page)
+	jsCode, err := utils.EvaluateTemplate(ev.jsCode, v, p)
 	if err != nil {
-		slog.Error("failed to evaluate JS code template", slog.Any("jsCode", e.jsCode), log.ErrVal(err))
+		slog.Error("failed to evaluate JS code template", slog.Any("jsCode", ev.jsCode), log.ErrVal(err))
 		return nil, err
 	}
 
 	// Execute JS code on the page or locator
-	var r interface{}
+	var res interface{}
 	if locator == "" {
-		slog.Debug("evaluating JS code on page", slog.Any("jsCode", jsCode), slog.Any("params", e.params))
-		r, err = page.Evaluate(jsCode, e.params)
+		slog.Debug("evaluating JS code on page", slog.Any("jsCode", jsCode), slog.Any("params", ev.params))
+		res, err = p.Evaluate(jsCode, ev.params)
 	} else {
-		slog.Debug("evaluating JS code on locator", slog.Any("locator", locator), slog.Any("jsCode", jsCode), slog.Any("params", e.params))
-		r, err = page.Locator(locator).Evaluate(jsCode, e.params)
+		slog.Debug("evaluating JS code on locator", slog.Any("locator", locator), slog.Any("jsCode", jsCode), slog.Any("params", ev.params))
+		res, err = p.Locator(locator).Evaluate(jsCode, ev.params)
 	}
 
 	if err != nil {
 		slog.Error("failed to evaluate JS code", log.ErrVal(err))
 	}
-	return r, err
+	return res, err
 }
 
 func buildEval(step config.Step) (Step, error) {

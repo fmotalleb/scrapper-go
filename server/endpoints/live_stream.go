@@ -83,7 +83,7 @@ func liveStream(c echo.Context) error {
 func handleWebSocket(c echo.Context, sendChan chan map[string]any) chan map[string]any {
 	conn, err := wsUpgrade.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {
-		slog.Error("webSocket upgrade error:", err)
+		slog.Error("webSocket upgrade error:", log.ErrVal(err))
 		return nil
 	}
 
@@ -91,7 +91,12 @@ func handleWebSocket(c echo.Context, sendChan chan map[string]any) chan map[stri
 
 	// Goroutine to read messages from the client
 	go func() {
-		defer conn.Close()
+		defer func() {
+			err := conn.Close()
+			if err != nil {
+				slog.Error("failed to close connection:", log.ErrVal(err))
+			}
+		}()
 		for {
 			var msg map[string]any
 			if err := conn.ReadJSON(&msg); err != nil {
@@ -105,7 +110,12 @@ func handleWebSocket(c echo.Context, sendChan chan map[string]any) chan map[stri
 
 	// Goroutine to send messages to the client
 	go func() {
-		defer conn.Close()
+		defer func() {
+			err := conn.Close()
+			if err != nil {
+				slog.Error("failed to close connection:", log.ErrVal(err))
+			}
+		}()
 		for msg := range sendChan {
 			if err := conn.WriteJSON(msg); err != nil {
 				slog.Error("write error:", log.ErrVal(err))

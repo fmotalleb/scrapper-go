@@ -1,3 +1,4 @@
+// Package server contains api server logic
 package server
 
 import (

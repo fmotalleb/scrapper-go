@@ -27,22 +27,22 @@ type fill struct {
 	conf    config.Step
 }
 
-func (s *fill) GetConfig() config.Step {
-	return s.conf
+func (filler *fill) GetConfig() config.Step {
+	return filler.conf
 }
 
 // Execute implements Step.
-func (f *fill) Execute(page playwright.Page, vars utils.Vars, result map[string]any) (interface{}, error) {
+func (filler *fill) Execute(p playwright.Page, v utils.Vars, r map[string]any) (interface{}, error) {
 	// Evaluate locator and value templates
-	locator, err := utils.EvaluateTemplate(f.locator, vars, page)
+	locator, err := utils.EvaluateTemplate(filler.locator, v, p)
 	if err != nil {
-		slog.Error("failed to evaluate locator template", slog.Any("locator", f.locator), log.ErrVal(err))
+		slog.Error("failed to evaluate locator template", slog.Any("locator", filler.locator), log.ErrVal(err))
 		return nil, err
 	}
 
-	fillValue, err := utils.EvaluateTemplate(f.value, vars, page)
+	fillValue, err := utils.EvaluateTemplate(filler.value, v, p)
 	if err != nil {
-		slog.Error("failed to evaluate value template", slog.Any("value", f.value), log.ErrVal(err))
+		slog.Error("failed to evaluate value template", slog.Any("value", filler.value), log.ErrVal(err))
 		return nil, err
 	}
 
@@ -50,7 +50,7 @@ func (f *fill) Execute(page playwright.Page, vars utils.Vars, result map[string]
 	slog.Debug("filling input", slog.Any("locator", locator), slog.Any("value", fillValue))
 
 	// Fill the locator with the evaluated value
-	return nil, page.Locator(locator).Fill(fillValue, f.params)
+	return nil, p.Locator(locator).Fill(fillValue, filler.params)
 }
 
 func buildFill(step config.Step) (Step, error) {

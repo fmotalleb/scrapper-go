@@ -33,13 +33,13 @@ type selectStep struct {
 	conf   config.Step
 }
 
-func (s *selectStep) GetConfig() config.Step {
-	return s.conf
+func (ss *selectStep) GetConfig() config.Step {
+	return ss.conf
 }
 
 // Execute implements Step.
-func (s *selectStep) Execute(page playwright.Page, vars utils.Vars, result map[string]any) (interface{}, error) {
-	locator, err := utils.EvaluateTemplate(s.locator, vars, page)
+func (ss *selectStep) Execute(p playwright.Page, v utils.Vars, r map[string]any) (interface{}, error) {
+	locator, err := utils.EvaluateTemplate(ss.locator, v, p)
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +49,7 @@ func (s *selectStep) Execute(page playwright.Page, vars utils.Vars, result map[s
 	// Consolidate the template evaluation and assignment
 	// Evaluating and setting values or labels
 	setValuesOrLabels := func(fieldName string, source []string) (*[]string, error) {
-		values, err := utils.EvaluateTemplates(source, vars, page)
+		values, err := utils.EvaluateTemplates(source, v, p)
 		if err != nil {
 			slog.Error(fmt.Sprintf("failed to execute template on %s", fieldName), log.ErrVal(err), slog.Any(fieldName, source))
 			return nil, err
@@ -58,13 +58,13 @@ func (s *selectStep) Execute(page playwright.Page, vars utils.Vars, result map[s
 	}
 
 	// Evaluate all options for select
-	if selectOpt.Values, err = setValuesOrLabels("values", s.values); err != nil {
+	if selectOpt.Values, err = setValuesOrLabels("values", ss.values); err != nil {
 		return nil, err
 	}
-	if selectOpt.ValuesOrLabels, err = setValuesOrLabels("values_or_labels", s.valuesOrLabels); err != nil {
+	if selectOpt.ValuesOrLabels, err = setValuesOrLabels("values_or_labels", ss.valuesOrLabels); err != nil {
 		return nil, err
 	}
-	if selectOpt.Labels, err = setValuesOrLabels("labels", s.labels); err != nil {
+	if selectOpt.Labels, err = setValuesOrLabels("labels", ss.labels); err != nil {
 		return nil, err
 	}
 	// if err := setValuesOrLabels("indexes", s.indexes, selectOpt.Indexes); err != nil {
@@ -72,7 +72,7 @@ func (s *selectStep) Execute(page playwright.Page, vars utils.Vars, result map[s
 	// }
 
 	// Convert index strings to integers
-	if values, err := utils.EvaluateTemplates(s.indexes, vars, page); err == nil {
+	if values, err := utils.EvaluateTemplates(ss.indexes, v, p); err == nil {
 		if values, err := utils.MapItems(values, strconv.Atoi); err == nil {
 			selectOpt.Indexes = &values
 		} else {
@@ -80,7 +80,7 @@ func (s *selectStep) Execute(page playwright.Page, vars utils.Vars, result map[s
 			return nil, err
 		}
 	} else {
-		slog.Error("failed to execute template on select Indexes", log.ErrVal(err), slog.Any("Indexes", s.indexes))
+		slog.Error("failed to execute template on select Indexes", log.ErrVal(err), slog.Any("Indexes", ss.indexes))
 		return nil, err
 	}
 
@@ -89,10 +89,10 @@ func (s *selectStep) Execute(page playwright.Page, vars utils.Vars, result map[s
 		len(*selectOpt.ValuesOrLabels) == 0 &&
 		len(*selectOpt.Labels) == 0 &&
 		len(*selectOpt.Indexes) == 0 {
-		return nil, fmt.Errorf("no valid select option values found for step: %v", s.conf)
+		return nil, fmt.Errorf("no valid select option values found for step: %v", ss.conf)
 	}
 
-	return page.Locator(locator).SelectOption(*selectOpt, s.params)
+	return p.Locator(locator).SelectOption(*selectOpt, ss.params)
 }
 
 func buildSelect(step config.Step) (Step, error) {

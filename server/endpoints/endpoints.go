@@ -1,3 +1,4 @@
+// Package endpoints holds logic of api endpoint
 package endpoints
 
 import "github.com/labstack/echo/v4"

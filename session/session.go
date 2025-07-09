@@ -1,3 +1,4 @@
+// Package session contains logic behind the session manager for API server
 package session
 
 import (

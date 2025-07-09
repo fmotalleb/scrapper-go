@@ -27,16 +27,16 @@ type nop struct {
 	conf config.Step
 }
 
-func (s *nop) GetConfig() config.Step {
-	return s.conf
+func (n *nop) GetConfig() config.Step {
+	return n.conf
 }
 
 // Execute implements Step.
-func (g *nop) Execute(p playwright.Page, vars utils.Vars, result map[string]any) (interface{}, error) {
+func (n *nop) Execute(p playwright.Page, v utils.Vars, r map[string]any) (interface{}, error) {
 	// Evaluate the URL template with the given variables
-	text, err := utils.EvaluateTemplate(g.text, vars, p)
+	text, err := utils.EvaluateTemplate(n.text, v, p)
 	if err != nil {
-		slog.Error("failed to evaluate URL template", slog.String("url", g.text), log.ErrVal(err))
+		slog.Error("failed to evaluate URL template", slog.String("url", n.text), log.ErrVal(err))
 		return nil, err
 	}
 
