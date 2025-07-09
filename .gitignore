@@ -3,3 +3,4 @@ scrapper-go
 .vscode/*.log
 vendor/
 dist/
+./coverage.*
