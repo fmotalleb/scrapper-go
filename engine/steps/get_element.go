@@ -41,7 +41,7 @@ var validModes = map[string]getTextMode{
 type getText struct {
 	locator string
 	mode    getTextMode
-	params  playwright.LocatorEvaluateOptions
+	params  playwright.PageLocatorOptions
 	conf    config.Step
 }
 
@@ -56,7 +56,7 @@ func (ge *getText) Execute(p playwright.Page, v utils.Vars, r map[string]any) (i
 		slog.Error("failed to evaluate locator template", slog.String("locator", ge.locator), log.ErrVal(err))
 		return nil, err
 	}
-	element := p.Locator(locator)
+	element := p.Locator(locator, ge.params)
 	var output interface{}
 
 	slog.Debug("fetching element content", slog.String("locator", locator), slog.String("mode", string(ge.mode)))
@@ -118,8 +118,8 @@ func buildElementSelector(step config.Step) (Step, error) {
 	}
 
 	// Load optional parameters
-	r.params = playwright.LocatorEvaluateOptions{}
-	if params, err := utils.LoadParams[playwright.LocatorEvaluateOptions](step); err != nil {
+	r.params = playwright.PageLocatorOptions{}
+	if params, err := utils.LoadParams[playwright.PageLocatorOptions](step); err != nil {
 		slog.Error("failed to read params", log.ErrVal(err), slog.Any("step", step))
 		return nil, err
 	} else {
