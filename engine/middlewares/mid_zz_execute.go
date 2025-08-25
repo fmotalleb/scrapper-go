@@ -31,6 +31,14 @@ func exec(p playwright.Page, s steps.Step, v utils.Vars, r map[string]any, next 
 		if !valid {
 			return fmt.Errorf("expected set-var to be a string, got: %T", key)
 		}
+		if nkey, err := utils.EvaluateTemplate(strKey, v, p); err != nil {
+			slog.Error("failed to evaluate template for set-var key",
+				slog.String("key", strKey),
+				log.ErrVal(err),
+			)
+		} else {
+			strKey = nkey
+		}
 		if err := setOrAppendWithMeta(r, strKey, result); err != nil {
 			slog.Error("failed to store data in variable",
 				slog.String("key", strKey),
