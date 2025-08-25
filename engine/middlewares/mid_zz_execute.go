@@ -54,6 +54,9 @@ func exec(p playwright.Page, s steps.Step, v utils.Vars, r map[string]any, next 
 }
 
 func setOrAppendWithMeta(r map[string]any, key string, value any) error {
+	if value == nil {
+		return nil
+	}
 	metaKey := "__$" + key
 	var isFirstTime bool
 	var hasMeta bool

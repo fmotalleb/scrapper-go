@@ -4,25 +4,36 @@ pipeline:
   browser_params:
     headless: false
   steps:
-    - goto: http://80.191.255.65/
+    - config:
+        timeout: 1500
+        nav_timeout: 1500
+    - goto: https://khamooshi.maztozi.ir/
     - click: "#ContentPlaceHolder1_rbIsAddress"
     - loop: "[1,990090345]"
+      loop-key: city
       steps:
         - select: "#ContentPlaceHolder1_ddlCity"
-          values: "{{ item }}"
+          values: "{{ city }}"
           on-error: ignore
-        - loop: '{{ eval "[...document.querySelectorAll(''#ContentPlaceHolder1_ddlArea > option'')].map((a) => a.getAttribute(''value''))" }}'
+        - sleep: 1s
+        - loop: |-
+            [{{ eval "[...document.querySelectorAll('#ContentPlaceHolder1_ddlArea > option')].map((a) => a.getAttribute('value')).filter((a) => a!='1' ).join(',')" }}]
+          loop-key: addr
           on-error: ignore
           steps:
-            - goto: http://80.191.255.65/
+            - goto: https://khamooshi.maztozi.ir/
+            - sleep: 1s
+            - click: "#ContentPlaceHolder1_rbIsAddress"
+            - click: "#ContentPlaceHolder1_ddlCity"
             - select: "#ContentPlaceHolder1_ddlCity"
-              values: "{{ item }}"
+              values: "{{ city }}"
               on-error: ignore
+            - sleep: 1ms
+            - click: "#ContentPlaceHolder1_ddlArea"
             - select: "#ContentPlaceHolder1_ddlArea"
-              values: "{{ item }}"
+              values: "{{ addr }}"
               on-error: ignore
-              params:
-                timeout: 1500
+            - sleep: 50ms
             - click: "#ContentPlaceHolder1_btnSearchOutage"
             - element: "#ContentPlaceHolder1_grdOutages"
               on-error: ignore

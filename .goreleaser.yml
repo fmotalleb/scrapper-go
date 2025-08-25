@@ -19,16 +19,12 @@ builds:
       - darwin
       - linux
       - windows
-    tags:
-      - with_utls
     goarch:
       - amd64
 
   - id: slim
     env:
       - CGO_ENABLED=0
-    tags:
-      - with_utls
     ldflags:
       - "-s"
       - "-w"
