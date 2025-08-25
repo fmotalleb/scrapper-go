@@ -56,6 +56,7 @@ func (ge *getText) Execute(p playwright.Page, v utils.Vars, r map[string]any) (i
 		slog.Error("failed to evaluate locator template", slog.String("locator", ge.locator), log.ErrVal(err))
 		return nil, err
 	}
+
 	element := p.Locator(locator, ge.params)
 	var output interface{}
 
