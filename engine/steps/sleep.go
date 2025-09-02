@@ -45,8 +45,7 @@ func (s *sleep) Execute(p playwright.Page, v utils.Vars, r map[string]any) (inte
 		return nil, err
 	}
 
-	// Log the sleep duration for confirmation
-	slog.Info("sleeping for duration", slog.String("duration", value.String()))
+	slog.Debug("sleeping for duration", slog.String("duration", value.String()))
 
 	// Sleep for the evaluated duration
 	time.Sleep(value)

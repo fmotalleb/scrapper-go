@@ -85,7 +85,8 @@ func ExecuteConfig(ctx context.Context, config config.ExecutionConfig) (map[stri
 			out[k] = v
 		}
 	}
-	slog.Info("Execution finished", slog.Any("vars_snapshot", vars.Snapshot()), slog.Any("result", out))
+	slog.Debug("engine state", slog.Any("vars_snapshot", vars.Snapshot()), slog.Any("result", out))
+	slog.Info("Execution finished")
 	return out, nil
 }
 
@@ -187,6 +188,6 @@ func handleKeepRunning(durationStr string) {
 		return
 	}
 
-	slog.Info("Sleeping for duration", slog.Duration("duration", sleepTime))
+	slog.Debug("Sleeping for duration", slog.Duration("duration", sleepTime))
 	time.Sleep(sleepTime)
 }

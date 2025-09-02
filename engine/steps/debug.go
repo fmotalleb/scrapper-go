@@ -48,7 +48,6 @@ func buildDebug(step config.Step) (Step, error) {
 	// Extract the URL from the step
 	var ok bool
 	if r.text, ok = step["debug"].(string); !ok {
-
 		return nil, errors.New("field to build debug node")
 	}
 
