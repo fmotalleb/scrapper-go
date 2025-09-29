@@ -18,7 +18,7 @@ require (
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/playwright-community/playwright-go v0.5200.1
 	github.com/rivo/tview v0.0.0-20250625164341-a4a78f1e05cb
-	github.com/spf13/cast v1.9.2
+	github.com/spf13/cast v1.10.0
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/viper v1.20.1
 	golang.org/x/exp v0.0.0-20250620022241-b7579e27df2b
