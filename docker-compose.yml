@@ -1,0 +1,12 @@
+services:
+  scrapper:
+    image: ghcr.io/fmotalleb/scrapper-go:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command:
+      - serve
+      - --address=0.0.0.0
+      - --port=8080
+    ports:
+      - "8080:8080"
