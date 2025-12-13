@@ -1,47 +1,88 @@
 # Scrapper-Go Engine Documentation
 
-This document provides detailed information about the core components of the Scrapper-Go engine: **Middlewares** and **Steps**. These components work together to execute web scraping pipelines defined in YAML configuration files.
+This document provides detailed information about the core components of the Scrapper-Go engine: **Pipeline Configuration**, **Middlewares**, and **Steps**. These components work together to execute web scraping pipelines defined in YAML configuration files.
+
+## Pipeline Configuration
+
+At the root of your YAML file, you can specify several high-level configurations that control the browser environment and define variables.
+
+```yaml
+# pipeline: (This key is optional)
+browser: chromium
+browser_params:
+  headless: false
+browser_page_options:
+  screen:
+    width: 1280
+    height: 763
+vars:
+  - name: my_variable
+    value: "static value"
+  - name: user_agent
+    value: "MyScraper/1.0"
+steps:
+  # ... your steps here
+```
+
+- **`browser`**: Specifies the browser to use. Can be `chromium`, `firefox`, or `webkit`.
+- **`browser_params`**: Parameters passed to the browser instance. Any valid Playwright `BrowserTypeLaunchOptions` can be used here (e.g., `headless`, `slow_mo`).
+- **`browser_page_options`**: Parameters passed when a new page is created. Any valid Playwright `BrowserNewPageOptions` can be used (e.g., `screen`, `user_agent`).
+- **`vars`**: A list of variables to be made available to the steps via templating.
+- **`steps`**: The list of actions to be performed in the pipeline.
+
+### The `vars` Block
+
+The `vars` block allows you to pre-define variables. These can be static values or dynamically generated.
+
+**Static Variables:**
+```yaml
+vars:
+  - name: loginBtn
+    value: "#login-button"
+```
+
+**Dynamic (Random) Variables:**
+You can generate random strings, which is useful for creating unique test data.
+
+```yaml
+vars:
+  - name: random_user_id
+    random: always # 'always' generates a new value each time the var is used
+    random_chars: "abcdefghijklmnopqrstuvwxyz"
+    random_length: 10
+  - name: session_email
+    random: once # 'once' generates the value once and reuses it
+    random_chars: "abcdef123456789"
+    random_length: 8
+    postfix: "@example.com"
+```
+These variables can be accessed in your steps using `{{ .variable_name }}`.
 
 ## Middlewares
 
-Middlewares are the backbone of the scraping process. They form a chain of functions that wrap around each `Step`'s execution, allowing for cross-cutting concerns like error handling, conditional execution, and looping. The middlewares are executed in a specific order, determined by their filenames.
-
----
-
-### `middleware.go`
-
-This file contains the core logic for managing and executing the middleware chain.
-
-- **`registerMiddleware(m middleware)`**: Adds a new middleware to the global list of middlewares.
-- **`HandleStep(...)`**: Initiates the execution of the middleware chain for a given `Step`. It calls the first middleware in the chain.
-- **`middlewareExec(index, ...)`**: A recursive function that executes the middleware at the current `index` and passes a `next` function that, when called, will execute the next middleware in the chain. The last middleware receives `nil` as the `next` function.
+Middlewares are the backbone of the scraping process. They form a chain of functions that wrap around each `Step`'s execution, allowing for cross-cutting concerns like error handling, conditional execution, and looping.
 
 ---
 
 ### `mid_00_err_handler.go`
 
-This is the first middleware in the chain and provides robust error handling for each step.
+Provides robust error handling. The behavior is controlled by the `on-error` key.
 
-**YAML Configuration:**
+**YAML Configuration & Modes:**
 
-The behavior of this middleware is controlled by the `on-error` key within a step's configuration.
-
-```yaml
-- click: ".some-button"
-  on-error: "ignore" # Can be "ignore", "print", or "panic"
-```
-
-**Modes:**
-
-- **`ignore`** (Default if `on-error` is not specified and an error occurs): The error is suppressed, and the pipeline execution continues to the next step.
-- **`print`**: The error is logged to the console, but the execution continues.
-- **`panic`**: The application panics and stops execution immediately.
+- **`ignore`**: Suppresses the error and continues execution. Useful for optional elements.
+  ```yaml
+  - click: ".optional-popup-close"
+    on-error: "ignore"
+  ```
+- **`print`**: Logs the error but continues execution.
+- **`panic`**: Stops execution immediately.
 
 ---
 
 ### `mid_10_if.go`
 
-This middleware enables conditional execution of a step based on a specified condition.
+Enables conditional execution of a step.
 
 **YAML Configuration:**
 
@@ -49,25 +90,18 @@ This middleware enables conditional execution of a step based on a specified con
 - click: ".a"
   if: "'.some-selector' | query.exists"
 ```
-
-**Logic:**
-
-1.  It looks for an `if` key in the step's configuration.
-2.  If `if` is not present, it proceeds to the next middleware in the chain.
-3.  If `if` is present, it evaluates the condition string. The string can contain templates and uses the `query` language to evaluate conditions on the page.
-4.  If the condition evaluates to `true`, it proceeds with the execution of the step.
-5.  If the condition evaluates to `false`, it returns an `errTestFailed`, and the step (and its subsequent middlewares) are not executed.
+The `if` condition is a powerful expression that can use templates and the custom `query` language to check for the existence of elements, their attributes, and more. Execution proceeds only if the condition evaluates to `true`.
 
 ---
 
 ### `mid_11_loop.go`
 
-This middleware allows a set of nested steps to be executed multiple times, either for a fixed number of iterations or over a list of items.
+Executes a set of nested steps multiple times.
 
 **YAML Configuration:**
 
 **1. Fixed Number of Iterations:**
-
+The `loop-key` (`index` here) holds the current iteration number.
 ```yaml
 - loop: "3"
   loop-key: "index" # Optional, defaults to "item"
@@ -76,30 +110,29 @@ This middleware allows a set of nested steps to be executed multiple times, eith
 ```
 
 **2. Iterating Over a List (from a variable):**
-
 ```yaml
-- set-var: "my_links"
-  element: "a"
-  mode: "html"
-- loop: "{{ .my_links }}"
-  loop-key: "link"
+- loop: "{{ .my_links_variable }}"
+  loop-key: "link" # Optional, defaults to "item"
   steps:
-    - debug: "Found link: {{ .link }}"
+    - goto: "{{ .link }}"
 ```
 
-**Logic:**
-
-1.  It checks for a `loop` key in the step's configuration.
-2.  The value of `loop` is evaluated. It can be a number (for a fixed loop) or a template that resolves to a JSON array.
-3.  It iterates based on the evaluated result.
-4.  In each iteration, it sets a variable in the context (default key is `item`, configurable with `loop-key`).
-5.  It then executes the `steps` defined within the loop configuration for each iteration.
+**3. Dynamic Loop from JavaScript Evaluation:**
+This advanced example gets a list of option values from a dropdown and then loops over them.
+```yaml
+- loop: '{{ eval "JSON.stringify([...document.querySelectorAll(''#my-select > option'')].map(o => o.value))" }}'
+  on-error: ignore
+  steps:
+    - select: "#my-select"
+      value: "{{ item }}"
+    - debug: "Selected option {{ item }}"
+```
 
 ---
 
 ### `mid_zz_execute.go`
 
-This is the final middleware in the chain. Its responsibility is to execute the actual `Step` and handle the result.
+The final middleware that executes the `Step` and optionally stores its result in a variable using `set-var`.
 
 **YAML Configuration:**
 
@@ -108,40 +141,19 @@ This is the final middleware in the chain. Its responsibility is to execute the 
   mode: "text"
   set-var: "page_title"
 ```
-
-**Logic:**
-
-1.  It calls the `Execute` method on the `Step` itself.
-2.  If the execution is successful and a `set-var` key is present in the step's configuration, it stores the result of the `Execute` method in the results map (`r`).
-3.  The `set-var` logic is smart: if you set the same variable multiple times, it will automatically convert the variable into a list and append the new values.
+If you use `set-var` with the same variable name multiple times, it will create a list and append the new values. This is useful for collecting data in a loop.
 
 ---
 
 ## Steps
 
-Steps are the individual actions that make up a scraping pipeline. Each step is a struct that implements the `Step` interface, which has two methods: `Execute` and `GetConfig`.
+Steps are the individual actions in a pipeline.
 
 ---
-
-### `step.go`
-
-This file defines the `Step` interface and contains the logic for building a list of `Step` objects from a YAML configuration.
-
-- **`Step` interface**:
-    - `Execute(...)`: Performs the action of the step.
-    - `GetConfig()`: Returns the original configuration of the step.
-- **`BuildSteps(...)`**: Takes a list of step configurations and uses a series of `stepSelector` functions to determine which step type to instantiate for each configuration.
-
----
-
 ### `click.go`
 
-Performs a click action on a specified element.
-
+Performs a click action on an element.
 **YAML Key:** `click`
-
-**Configuration:**
-
 ```yaml
 - click: "#submit-button"
   # Optional Playwright LocatorClickOptions can be added here
@@ -149,109 +161,70 @@ Performs a click action on a specified element.
 ```
 
 ---
-
 ### `config.go`
 
-Configures engine-level settings.
-
+Configures engine-level settings during execution.
 **YAML Key:** `config`
-
-**Configuration:**
-
 ```yaml
 - config:
-    timeout: 30000 # in milliseconds
-    nav_timeout: 60000 # in milliseconds
+    timeout: 30000 # Default timeout in milliseconds
+    nav_timeout: 60000 # Default navigation timeout in milliseconds
 ```
 
 ---
-
 ### `debug.go`
 
-Logs a message to the console. Useful for debugging pipelines.
-
+Logs a message to the console. Excellent for debugging.
 **YAML Key:** `debug`
-
-**Configuration:**
-
 ```yaml
-- debug: "Current URL is {{ .page.url }}"
+- debug: "Current URL is {{ .page.url }} and title is {{ .page.title }}"
 ```
 
 ---
-
 ### `eval.go`
 
-Evaluates a JavaScript expression on the page or within the context of a specific element.
-
+Evaluates JavaScript.
 **YAML Key:** `eval`
-
-**Configuration:**
-
-**On the page:**
 ```yaml
+# On the page
 - eval: "() => document.title"
   set-var: "pageTitle"
-```
 
-**On an element:**
-```yaml
+# On an element, to get its text content
 - locator: "#my-element"
   eval: "el => el.textContent"
   set-var: "elementText"
 ```
 
 ---
-
 ### `fill.go`
 
-Fills an input field with a specified value.
-
+Fills an input field.
 **YAML Key:** `fill`
-
-**Configuration:**
-
 ```yaml
 - fill: "#username"
   value: "my_user"
 - fill: "#password"
-  value: "{{ .env.PASSWORD }}" # Using a template
+  value: "{{ .env.PASSWORD }}" # Using an environment variable
 ```
 
 ---
-
 ### `get_element.go`
 
 Retrieves content from an element.
-
 **YAML Key:** `element`
-
-**Configuration:**
-
 ```yaml
 - element: "h1"
   mode: "text" # "text", "html", "value", "table", "table-flat"
   set-var: "page_title"
 ```
-
-**Modes:**
-
-- `text`: Gets the `textContent`.
-- `html`: Gets the `innerHTML`.
-- `value`: Gets the `inputValue` (for form elements).
-- `table`: Parses a `<table>` into a nested list of lists.
-- `table-flat`: Parses a `<table>` into a flat list of strings.
+- **Modes**: `text`, `html` (innerHTML), `value` (input value), `table` (parses a `<table>` into a list of lists), `table-flat` (parses a `<table>` into a flat list).
 
 ---
-
 ### `goto.go`
 
-Navigates the browser to a specified URL.
-
+Navigates to a URL.
 **YAML Key:** `goto`
-
-**Configuration:**
-
 ```yaml
 - goto: "https://example.com"
   # Optional Playwright PageGotoOptions can be added here
@@ -259,104 +232,121 @@ Navigates the browser to a specified URL.
 ```
 
 ---
-
 ### `mouse.go`
 
-Performs mouse actions like clicking, double-clicking, moving, and scrolling at specific coordinates.
-
+Performs direct mouse actions.
 **YAML Key:** `mouse`
-
-**Configuration:**
-
 ```yaml
 - mouse: "100,200" # X,Y coordinates
   action: "click" # "click", "double-click", "scroll", "move", "up", "down"
 ```
 
 ---
-
 ### `nop.go`
 
-The "no operation" step. It does nothing but can be useful as a container for other logic, especially loops, when no other action is needed.
-
+"No operation" step. Useful as a container for logic like loops when no other action is needed.
 **YAML Key:** `nop`
-
-**Configuration:**
-
 ```yaml
-- nop: "Just a placeholder"
-- loop: "5" # A loop without any other primary action
+- loop: "5" # A loop with no primary action
   steps:
     - debug: "Looping..."
 ```
 
 ---
-
 ### `omit.go`
 
 Deletes a variable from the context.
-
 **YAML Key:** `omit`
-
-**Configuration:**
-
 ```yaml
 - omit: "variable_to_delete"
 ```
 
 ---
-
 ### `screenshot.go`
 
-Takes a screenshot of a specific element and returns it as a base64 encoded string.
-
+Takes a screenshot of an element.
 **YAML Key:** `screenshot`
-
-**Configuration:**
-
 ```yaml
 - screenshot: "#my-chart"
-  set-var: "chart_image_b64"
-  # Optional Playwright LocatorScreenshotOptions can be added here
+  set-var: "chart_image_b64" # Returns as a base64 encoded string
 ```
 
 ---
-
 ### `select.go`
 
-Selects one or more options in a `<select>` dropdown element.
-
+Selects options in a `<select>` dropdown.
 **YAML Key:** `select`
-
-**Configuration:**
-
-You can select by value, label, or index.
-
 ```yaml
 - select: "#my-select"
-  # Select by value
-  value: "option-1"
-  # Or by label
-  label: "Option 2"
-  # Or by index
-  index: "2"
-  # Multiple selections are also possible
-  values:
-    - "option-3"
-    - "option-4"
+  value: "option-1" # Can also use 'label' or 'index'
 ```
 
 ---
-
 ### `sleep.go`
 
-Pauses the execution for a specified duration.
-
+Pauses execution.
 **YAML Key:** `sleep`
-
-**Configuration:**
-
 ```yaml
 - sleep: "5s" # 5 seconds
 - sleep: "100ms" # 100 milliseconds
+```
+
+---
+
+## Full Example
+
+Here is a complete example that demonstrates many of the features described above. It signs up for a service using randomly generated credentials and extracts an API key.
+
+```yaml
+pipeline:
+  browser: chromium
+  browser_params:
+    headless: false # Run in headed mode for debugging
+  
+  # Define variables for use in the steps
+  vars:
+    - name: random_first_name
+      random: once
+      random_chars: "abcdefghijklmnopqrstuvwxyz"
+      random_length: 8
+    - name: email
+      random: once
+      random_chars: "abcdef123456789"
+      random_length: 10
+      postfix: "@gmail.com"
+    - name: password
+      random: once
+      random_length: 12
+      random_chars: "abcdefghijklmnopqrstuvwxyz123456789"
+  
+  # Define the sequence of steps
+  steps:
+    - goto: https://docs.apryse.com/try-now
+    - click: "nav > div > div.flex.items-center.lg\\:mx-2 > div:nth-child(1) > button"
+    - click: "#sign-up-inline-text > a"
+    - fill: "#firstName"
+      value: "{{ random_first_name }}"
+    - fill: "#lastName"
+      value: "User"
+    - fill: "#email"
+      value: "{{ email }}"
+    - fill: "#password"
+      value: "{{ password }}"
+    - fill: "#password-confirm"
+      value: "{{ password }}"
+    
+    # Select country from dropdown
+    - click: "#country"
+    - sleep: 1s # Wait a moment for dropdown to be ready
+    - select: "#country"
+      value: "Nigeria"
+      
+    - click: "#kc-signup"
+    - goto: "https://docs.apryse.com/web/guides/get-started/react"
+    - click: "body > div.relative.flex > div.h-full.w-full.flex-1 > div > div.min-h-\\[calc\\(100vh_-_144px\\)\\].flex-1.overflow-x-hidden.px-4.pb-12.sm\\:px-8 > div.mb-20.mt-4 > div.my-4.min-w-\\[207px\\] > div.text-secondary.bg-secondary.flex.flex-col.gap-2.p-4 > div:nth-child(1) > div > div.my-2 > button"
+    
+    # Extract the generated key and store it in the 'result' variable
+    - element: "#key-value"
+      mode: value
+      set-var: result
 ```
