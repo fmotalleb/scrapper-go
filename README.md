@@ -47,6 +47,8 @@ Scrapper-Go is a powerful and flexible Go application that acts as a wrapper aro
 
 ### Executing a Scraping Pipeline
 
+You can see [Documentation](./DOCUMENTATION.md) for more information on pipelines and logics.
+
 You can run a YAML-defined scraping pipeline directly:
 
 ```bash
@@ -71,6 +73,8 @@ Run Scrapper-Go as an API service. By default, it listens on `127.0.0.1:8080`.
 ./scrapper-go serve -a 0.0.0.0 -p 8081
 ```
 
+For API usage see [Api Documentation](./API_DOCUMENTATION.md) (ai generated might be slope, look at the code for actual implementation).
+
 #### `setup` - Install Playwright Dependencies
 
 As described in the installation section, this command helps manage Playwright's browsers and drivers.
@@ -90,6 +94,8 @@ Start an interactive shell for direct interaction and testing of scraping steps.
 ## Configuration
 
 Scrapper-Go looks for a configuration file named `.scrapper-go.yaml` in your home directory by default. You can specify a different configuration file using the `-c` or `--config` flag.
+
+Docs are generated using gemini so there will be hiccups somewhere. I wont be writing any docs manually because this software is used to bypass js challenge on our internal hot-spot login page and some minor scrapping situations, this is mostly an experiment :).
 
 ## Contributing
 

@@ -4,38 +4,16 @@ pipeline:
   browser_params:
     headless: false
   steps:
-    - config:
-        timeout: 1500
-        nav_timeout: 1500
-    - goto: https://khamooshi.maztozi.ir/
-    - click: "#ContentPlaceHolder1_rbIsAddress"
-    - loop: "[1,990090345]"
-      loop-key: city
+    - goto: https://hub.iranserver.com/clientarea.php?action=domains&filter_name=&filter_status=Active
+    - sleep: 20s
+    - goto: https://hub.iranserver.com/clientarea.php?action=domains&filter_name=&filter_status=Active
+    - element: body > div.page > div > div > div > div > div.panel-body.margin-top-10 > div > div.text-center > ul > li:last-child > a
+    - sleep: 1s
+    - loop: |
+        [1,2,3,4]
       steps:
-        - select: "#ContentPlaceHolder1_ddlCity"
-          values: "{{ city }}"
-          on-error: ignore
-        - sleep: 1s
-        - loop: |-
-            [{{ eval "[...document.querySelectorAll('#ContentPlaceHolder1_ddlArea > option')].map((a) => a.getAttribute('value')).filter((a) => a!='1' ).join(',')" }}]
-          loop-key: addr
-          on-error: ignore
-          steps:
-            - goto: https://khamooshi.maztozi.ir/
-            - sleep: 1s
-            - click: "#ContentPlaceHolder1_rbIsAddress"
-            - click: "#ContentPlaceHolder1_ddlCity"
-            - select: "#ContentPlaceHolder1_ddlCity"
-              values: "{{ city }}"
-              on-error: ignore
-            - sleep: 1ms
-            - click: "#ContentPlaceHolder1_ddlArea"
-            - select: "#ContentPlaceHolder1_ddlArea"
-              values: "{{ addr }}"
-              on-error: ignore
-            - sleep: 50ms
-            - click: "#ContentPlaceHolder1_btnSearchOutage"
-            - element: "#ContentPlaceHolder1_grdOutages"
-              on-error: ignore
-              mode: table
-              set-var: result
+      - sleep: 1s
+      - goto: https://hub.iranserver.com/clientarea.php?action=domains&filter_name=&filter_status=Active&page={{ item }}
+      - element: table
+        mode: table
+        set-var: domains

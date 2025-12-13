@@ -7,21 +7,21 @@ This document provides detailed information about the core components of the Scr
 At the root of your YAML file, you can specify several high-level configurations that control the browser environment and define variables.
 
 ```yaml
-# pipeline: (This key is optional)
-browser: chromium
-browser_params:
-  headless: false
-browser_page_options:
-  screen:
-    width: 1280
-    height: 763
-vars:
-  - name: my_variable
-    value: "static value"
-  - name: user_agent
-    value: "MyScraper/1.0"
-steps:
-  # ... your steps here
+pipeline:
+  browser: chromium
+  browser_params:
+    headless: false
+  browser_page_options:
+    screen:
+      width: 1280
+      height: 763
+  vars:
+    - name: my_variable
+      value: "static value"
+    - name: user_agent
+      value: "MyScraper/1.0"
+  steps:
+    # ... your steps here
 ```
 
 - **`browser`**: Specifies the browser to use. Can be `chromium`, `firefox`, or `webkit`.
@@ -56,6 +56,7 @@ vars:
     random_length: 8
     postfix: "@example.com"
 ```
+
 These variables can be accessed in your steps using `{{ .variable_name }}`.
 
 ## Middlewares
@@ -301,52 +302,64 @@ Here is a complete example that demonstrates many of the features described abov
 pipeline:
   browser: chromium
   browser_params:
-    headless: false # Run in headed mode for debugging
-  
-  # Define variables for use in the steps
+    headless: false
+
   vars:
-    - name: random_first_name
+    - name: username
       random: once
       random_chars: "abcdefghijklmnopqrstuvwxyz"
-      random_length: 8
+      random_length: 10
+
     - name: email
       random: once
-      random_chars: "abcdef123456789"
-      random_length: 10
-      postfix: "@gmail.com"
+      random_chars: "abcdefghijklmnopqrstuvwxyz123456789"
+      random_length: 8
+      postfix: "@example.com"
+
     - name: password
       random: once
-      random_length: 12
-      random_chars: "abcdefghijklmnopqrstuvwxyz123456789"
-  
-  # Define the sequence of steps
+      random_chars: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123456789"
+      random_length: 14
+
   steps:
-    - goto: https://docs.apryse.com/try-now
-    - click: "nav > div > div.flex.items-center.lg\\:mx-2 > div:nth-child(1) > button"
-    - click: "#sign-up-inline-text > a"
-    - fill: "#firstName"
-      value: "{{ random_first_name }}"
-    - fill: "#lastName"
-      value: "User"
-    - fill: "#email"
+    # Open demo signup page
+    - goto: https://example.testproject.io/web/
+
+    # Start signup flow
+    - click: "a[href='/register']"
+
+    # Fill registration form
+    - fill: "input[name='username']"
+      value: "{{ username }}"
+
+    - fill: "input[name='email']"
       value: "{{ email }}"
-    - fill: "#password"
+
+    - fill: "input[name='password']"
       value: "{{ password }}"
-    - fill: "#password-confirm"
+
+    - fill: "input[name='confirmPassword']"
       value: "{{ password }}"
-    
-    # Select country from dropdown
-    - click: "#country"
-    - sleep: 1s # Wait a moment for dropdown to be ready
-    - select: "#country"
-      value: "Nigeria"
-      
-    - click: "#kc-signup"
-    - goto: "https://docs.apryse.com/web/guides/get-started/react"
-    - click: "body > div.relative.flex > div.h-full.w-full.flex-1 > div > div.min-h-\\[calc\\(100vh_-_144px\\)\\].flex-1.overflow-x-hidden.px-4.pb-12.sm\\:px-8 > div.mb-20.mt-4 > div.my-4.min-w-\\[207px\\] > div.text-secondary.bg-secondary.flex.flex-col.gap-2.p-4 > div:nth-child(1) > div > div.my-2 > button"
-    
-    # Extract the generated key and store it in the 'result' variable
-    - element: "#key-value"
+
+    # Select role from dropdown
+    - click: "select#role"
+    - select: "select#role"
+      value: "tester"
+
+    # Submit registration
+    - click: "button[type='submit']"
+
+    # Navigate to dashboard page
+    - goto: "https://example.testproject.io/dashboard"
+
+    # Open API key modal
+    - click: "button#create-api-key"
+
+    # Extract generated API key
+    - element: "input#api-key"
       mode: value
       set-var: result
+
+    - screenshot: "#qrcode"
+      set-var: qr
 ```

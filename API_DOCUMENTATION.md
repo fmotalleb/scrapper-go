@@ -33,20 +33,22 @@ The request body must be a JSON object containing the full pipeline configuratio
 curl -X POST http://127.0.0.1:8080/process \
 -H "Content-Type: application/json" \
 -d '{
-  "browser": "chromium",
-  "browser_params": {
-    "headless": true
-  },
-  "steps": [
-    {
-      "goto": "https://example.com"
+  "pipeline": {
+    "browser": "chromium",
+    "browser_params": {
+      "headless": true
     },
-    {
-      "element": "h1",
-      "mode": "text",
-      "set-var": "title"
-    }
-  ]
+    "steps": [
+      {
+        "goto": "https://example.com"
+      },
+      {
+        "element": "h1",
+        "mode": "text",
+        "set-var": "title"
+      }
+    ]
+  }
 }'
 ```
 
@@ -149,7 +151,7 @@ curl -X POST http://127.0.0.1:8080/sessions/a1b2c3d4-e5f6-ùi \
 ```bash
 curl -X POST http://127.0.0.1:8080/sessions/a1b2c3d4-e5f6-ùi \
 -H "Content-Type: application/json" \
--d \'[
+-d '[
   {
     "fill": "#username",
     "value": "my-user"
