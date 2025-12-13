@@ -23,7 +23,7 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/FMotalleb/go-tools/git"
+	"github.com/fmotalleb/go-tools/git"
 	"github.com/fmotalleb/scrapper-go/config"
 	"github.com/fmotalleb/scrapper-go/engine"
 	"github.com/fmotalleb/scrapper-go/log"

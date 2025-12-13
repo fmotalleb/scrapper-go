@@ -5,7 +5,7 @@ linters-settings:
   gocyclo:
     min-complexity: 15
   goimports:
-    local-prefixes: github.com/FMotalleb/scrapper-go
+    local-prefixes: github.com/fmotalleb/scrapper-go
   govet: {}
   misspell:
     locale: US
