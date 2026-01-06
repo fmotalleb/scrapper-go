@@ -11,7 +11,7 @@ tool (
 require (
 	github.com/PuerkitoBio/goquery v1.11.0
 	github.com/fmotalleb/go-tools v0.1.66
-	github.com/gdamore/tcell/v2 v2.13.4
+	github.com/gdamore/tcell/v2 v2.13.5
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/websocket v1.5.3
 	github.com/labstack/echo/v4 v4.14.0
