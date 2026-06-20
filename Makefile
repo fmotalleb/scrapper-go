@@ -46,6 +46,7 @@ compile:
 	
 .PHONY: install
 install: ## install goreleaser 
+	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 	go install github.com/goreleaser/goreleaser/v2@latest
 
 .PHONY: spell
