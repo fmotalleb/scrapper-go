@@ -8,11 +8,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/playwright-community/playwright-go"
+
 	"github.com/fmotalleb/scrapper-go/config"
 	"github.com/fmotalleb/scrapper-go/engine/middlewares"
 	"github.com/fmotalleb/scrapper-go/engine/steps"
 	"github.com/fmotalleb/scrapper-go/log"
-	"github.com/playwright-community/playwright-go"
 )
 
 // ExecuteConfig loaded from cli or api

@@ -4,9 +4,10 @@ package server
 import (
 	"log/slog"
 
+	"github.com/labstack/echo/v4"
+
 	"github.com/fmotalleb/scrapper-go/log"
 	"github.com/fmotalleb/scrapper-go/server/endpoints"
-	"github.com/labstack/echo/v4"
 )
 
 func StartServer(address string) error {

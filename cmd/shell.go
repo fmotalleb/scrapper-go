@@ -2,8 +2,9 @@
 package cmd
 
 import (
-	"github.com/fmotalleb/scrapper-go/shell"
 	"github.com/spf13/cobra"
+
+	"github.com/fmotalleb/scrapper-go/shell"
 )
 
 // shellCmd represents the shell command

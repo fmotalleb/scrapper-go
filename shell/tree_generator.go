@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/fmotalleb/scrapper-go/utils"
 	"github.com/rivo/tview"
+
+	"github.com/fmotalleb/scrapper-go/utils"
 )
 
 // newNode creates a new tree node with the given label and collapsible behavior.

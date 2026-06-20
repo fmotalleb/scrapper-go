@@ -6,10 +6,11 @@ import (
 	"os"
 	"time"
 
+	"github.com/mitchellh/mapstructure"
+
 	"github.com/fmotalleb/scrapper-go/config"
 	"github.com/fmotalleb/scrapper-go/engine"
 	"github.com/fmotalleb/scrapper-go/log"
-	"github.com/mitchellh/mapstructure"
 )
 
 func bindToBrowser(ctx context.Context, recvChan <-chan map[string]any) <-chan map[string]any {

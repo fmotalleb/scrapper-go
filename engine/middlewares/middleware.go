@@ -5,9 +5,10 @@ package middlewares
 import (
 	"errors"
 
+	"github.com/playwright-community/playwright-go"
+
 	"github.com/fmotalleb/scrapper-go/engine/steps"
 	"github.com/fmotalleb/scrapper-go/utils"
-	"github.com/playwright-community/playwright-go"
 )
 
 var middlewares []middleware

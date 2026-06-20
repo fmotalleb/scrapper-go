@@ -4,10 +4,11 @@ import (
 	"errors"
 	"log/slog"
 
-	"github.com/fmotalleb/scrapper-go/config"
-	"github.com/fmotalleb/scrapper-go/utils"
 	"github.com/playwright-community/playwright-go"
 	"github.com/spf13/cast"
+
+	"github.com/fmotalleb/scrapper-go/config"
+	"github.com/fmotalleb/scrapper-go/utils"
 )
 
 func init() {

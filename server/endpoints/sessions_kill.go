@@ -4,8 +4,9 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/fmotalleb/scrapper-go/session"
 	"github.com/labstack/echo/v4"
+
+	"github.com/fmotalleb/scrapper-go/session"
 )
 
 func init() {

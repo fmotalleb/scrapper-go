@@ -1,8 +1,9 @@
 package utils
 
 import (
-	"github.com/fmotalleb/scrapper-go/config"
 	"github.com/mitchellh/mapstructure"
+
+	"github.com/fmotalleb/scrapper-go/config"
 )
 
 func LoadParams[T any](step config.Step) (*T, error) {

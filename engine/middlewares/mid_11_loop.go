@@ -6,12 +6,13 @@ import (
 	"fmt"
 	"strconv"
 
+	playwright "github.com/playwright-community/playwright-go"
+	"golang.org/x/exp/slog"
+
 	"github.com/fmotalleb/scrapper-go/config"
 	"github.com/fmotalleb/scrapper-go/engine/steps"
 	"github.com/fmotalleb/scrapper-go/log"
 	"github.com/fmotalleb/scrapper-go/utils"
-	playwright "github.com/playwright-community/playwright-go"
-	"golang.org/x/exp/slog"
 )
 
 func init() {

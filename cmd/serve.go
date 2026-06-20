@@ -5,9 +5,10 @@ import (
 	"log/slog"
 	"os"
 
+	"github.com/spf13/cobra"
+
 	"github.com/fmotalleb/scrapper-go/log"
 	"github.com/fmotalleb/scrapper-go/server"
-	"github.com/spf13/cobra"
 )
 
 type serveArgs struct {

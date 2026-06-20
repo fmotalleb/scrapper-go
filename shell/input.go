@@ -5,8 +5,9 @@ import (
 	"log/slog"
 	"strings"
 
-	"github.com/fmotalleb/scrapper-go/log"
 	"github.com/rivo/tview"
+
+	"github.com/fmotalleb/scrapper-go/log"
 )
 
 func buildInput() (*tview.Flex, <-chan map[string]any) {

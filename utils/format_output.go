@@ -6,8 +6,9 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/fmotalleb/scrapper-go/log"
 	"gopkg.in/yaml.v3"
+
+	"github.com/fmotalleb/scrapper-go/log"
 )
 
 type Output string

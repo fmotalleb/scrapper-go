@@ -4,12 +4,13 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/fmotalleb/scrapper-go/config"
-	"github.com/fmotalleb/scrapper-go/engine"
-	"github.com/fmotalleb/scrapper-go/log"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
 	"github.com/mitchellh/mapstructure"
+
+	"github.com/fmotalleb/scrapper-go/config"
+	"github.com/fmotalleb/scrapper-go/engine"
+	"github.com/fmotalleb/scrapper-go/log"
 )
 
 func init() {

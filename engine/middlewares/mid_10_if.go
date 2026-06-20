@@ -4,11 +4,12 @@ import (
 	"errors"
 	"log/slog"
 
+	playwright "github.com/playwright-community/playwright-go"
+
 	"github.com/fmotalleb/scrapper-go/config"
 	"github.com/fmotalleb/scrapper-go/engine/steps"
 	"github.com/fmotalleb/scrapper-go/query"
 	"github.com/fmotalleb/scrapper-go/utils"
-	playwright "github.com/playwright-community/playwright-go"
 )
 
 var (

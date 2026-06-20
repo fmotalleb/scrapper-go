@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"log/slog"
 
+	playwright "github.com/playwright-community/playwright-go"
+
 	"github.com/fmotalleb/scrapper-go/engine/steps"
 	"github.com/fmotalleb/scrapper-go/log"
 	"github.com/fmotalleb/scrapper-go/utils"
-	playwright "github.com/playwright-community/playwright-go"
 )
 
 func init() {

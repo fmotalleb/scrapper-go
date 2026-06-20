@@ -6,11 +6,12 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/labstack/echo/v4"
+	"github.com/mitchellh/mapstructure"
+
 	"github.com/fmotalleb/scrapper-go/config"
 	"github.com/fmotalleb/scrapper-go/log"
 	"github.com/fmotalleb/scrapper-go/session"
-	"github.com/labstack/echo/v4"
-	"github.com/mitchellh/mapstructure"
 )
 
 func init() {

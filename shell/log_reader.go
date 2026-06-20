@@ -3,8 +3,9 @@ package shell
 import (
 	"fmt"
 
-	"github.com/fmotalleb/scrapper-go/log"
 	"github.com/rivo/tview"
+
+	"github.com/fmotalleb/scrapper-go/log"
 )
 
 // createLogView initializes the log view for displaying logs in the UI.

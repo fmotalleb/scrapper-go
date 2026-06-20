@@ -24,12 +24,13 @@ import (
 	"os"
 
 	"github.com/fmotalleb/go-tools/git"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+
 	"github.com/fmotalleb/scrapper-go/config"
 	"github.com/fmotalleb/scrapper-go/engine"
 	"github.com/fmotalleb/scrapper-go/log"
 	"github.com/fmotalleb/scrapper-go/utils"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 var (

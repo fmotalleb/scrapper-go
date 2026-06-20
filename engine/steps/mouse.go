@@ -5,9 +5,10 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/playwright-community/playwright-go"
+
 	"github.com/fmotalleb/scrapper-go/config"
 	"github.com/fmotalleb/scrapper-go/utils"
-	"github.com/playwright-community/playwright-go"
 )
 
 func init() {
