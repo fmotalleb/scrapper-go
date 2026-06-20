@@ -56,7 +56,7 @@ spell: ## misspell
 
 .PHONY: lint
 lint: ## golangci-lint
-	go tool golangci-lint run --fix
+	golangci-lint run --fix
 
 .PHONY: vuln
 vuln: ## govulncheck
