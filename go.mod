@@ -1,6 +1,6 @@
 module github.com/fmotalleb/scrapper-go
 
-go 1.25.0
+go 1.26
 
 tool (
 	github.com/client9/misspell/cmd/misspell
