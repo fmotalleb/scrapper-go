@@ -1,0 +1,68 @@
+info:
+  name: Handle
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{base_url}}/sessions/{{session_id}}"
+  body:
+    type: json
+    data: |-
+      [
+        {
+          "config": {
+            "timeout": 1500,
+            "nav_timeout": 1500
+          }
+        },
+        {
+          "goto": "https://khamooshi.maztozi.ir/"
+        },
+        {
+          "sleep": "1s"
+        },
+        {
+          "loop": "{{tstart}} eval `JSON.stringify(\n  [...document.querySelectorAll('#ContentPlaceHolder1_ddlCity > option')]\n  .map((a) =>  a.getAttribute('value'))\n  .filter((a) => a!='-1' )\n  )`\n}}",
+          "loop-key": "addr",
+          "on-error": "ignore",
+          "steps": [
+            {
+              "goto": "https://khamooshi.maztozi.ir/"
+            },
+            {
+              "click": "#ContentPlaceHolder1_rbIsAddress"
+            },
+            {
+              "sleep": "50ms"
+            },
+            {
+              "click": "#ContentPlaceHolder1_ddlCity"
+            },
+            {
+              "select": "#ContentPlaceHolder1_ddlCity",
+              "values": "{{tstart}} addr }}",
+              "on-error": "ignore"
+            },
+            {
+              "sleep": "50ms"
+            },
+            {
+              "click": "#ContentPlaceHolder1_btnSearchOutage"
+            },
+            {
+              "element": "#ContentPlaceHolder1_grdOutages",
+              "on-error": "ignore",
+              "mode": "table",
+              "set-var": "{{tstart}} eval \"ContentPlaceHolder1_ddlCity.selectedOptions[0].text\" }}"
+            }
+          ]
+        }
+      ]
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

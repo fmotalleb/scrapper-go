@@ -1,0 +1,10 @@
+info:
+  name: Sessions
+  type: folder
+  seq: 1
+
+request:
+  auth: inherit
+  variables:
+    - name: session_id
+      value: ""

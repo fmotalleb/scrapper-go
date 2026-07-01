@@ -1,0 +1,28 @@
+opencollection: 1.0.0
+
+info:
+  name: Scrapper
+config:
+  proxy:
+    inherit: true
+    config:
+      protocol: http
+      hostname: ""
+      port: ""
+      auth:
+        username: ""
+        password: ""
+      bypassProxy: ""
+
+request:
+  variables:
+    - name: base_url
+      value: http://127.0.0.1:8080
+    - name: tstart
+      value: "{{"
+bundled: false
+extensions:
+  bruno:
+    ignore:
+      - node_modules
+      - .git

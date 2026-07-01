@@ -1,0 +1,31 @@
+info:
+  name: Create
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{base_url}}/sessions"
+  body:
+    type: json
+    data: |-
+      {
+        "pipeline": {
+          "browser": "chromium",
+          "browser_params": {
+            "headless": false
+          }
+        }
+      }
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: after-response
+      code: bru.setVar('session_id', res.getBody().id)
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

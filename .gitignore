@@ -4,3 +4,4 @@ scrapper-go
 vendor/
 dist/
 /coverage*
+__*
