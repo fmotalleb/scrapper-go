@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/playwright-community/playwright-go"
+	"github.com/mxschmitt/playwright-go"
 
 	"github.com/fmotalleb/scrapper-go/config"
 	"github.com/fmotalleb/scrapper-go/engine/middlewares"

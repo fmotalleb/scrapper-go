@@ -5,7 +5,7 @@ package middlewares
 import (
 	"errors"
 
-	"github.com/playwright-community/playwright-go"
+	"github.com/mxschmitt/playwright-go"
 
 	"github.com/fmotalleb/scrapper-go/engine/steps"
 	"github.com/fmotalleb/scrapper-go/utils"

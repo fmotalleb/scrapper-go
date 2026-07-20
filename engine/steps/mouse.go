@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/playwright-community/playwright-go"
+	"github.com/mxschmitt/playwright-go"
 
 	"github.com/fmotalleb/scrapper-go/config"
 	"github.com/fmotalleb/scrapper-go/utils"

@@ -6,7 +6,7 @@ import (
 	"log/slog"
 	"text/template"
 
-	"github.com/playwright-community/playwright-go"
+	"github.com/mxschmitt/playwright-go"
 )
 
 func unShadow(data map[string]any, key string) map[string]any {

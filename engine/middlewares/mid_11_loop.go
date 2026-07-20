@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strconv"
 
-	playwright "github.com/playwright-community/playwright-go"
+	playwright "github.com/mxschmitt/playwright-go"
 	"golang.org/x/exp/slog"
 
 	"github.com/fmotalleb/scrapper-go/config"

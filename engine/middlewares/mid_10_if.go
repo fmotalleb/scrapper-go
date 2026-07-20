@@ -4,7 +4,7 @@ import (
 	"errors"
 	"log/slog"
 
-	playwright "github.com/playwright-community/playwright-go"
+	playwright "github.com/mxschmitt/playwright-go"
 
 	"github.com/fmotalleb/scrapper-go/config"
 	"github.com/fmotalleb/scrapper-go/engine/steps"

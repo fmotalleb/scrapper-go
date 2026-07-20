@@ -1,7 +1,7 @@
 // Package config contains basic data structs
 package config
 
-import "github.com/playwright-community/playwright-go"
+import "github.com/mxschmitt/playwright-go"
 
 type ExecutionConfig struct {
 	Pipeline Pipeline `mapstructure:"pipeline"`

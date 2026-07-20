@@ -3,7 +3,7 @@ package middlewares
 import (
 	"log/slog"
 
-	playwright "github.com/playwright-community/playwright-go"
+	playwright "github.com/mxschmitt/playwright-go"
 
 	"github.com/fmotalleb/scrapper-go/engine/steps"
 	"github.com/fmotalleb/scrapper-go/log"
