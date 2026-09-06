@@ -4,15 +4,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log/slog"
 	"strconv"
-
-	playwright "github.com/mxschmitt/playwright-go"
-	"golang.org/x/exp/slog"
 
 	"github.com/fmotalleb/scrapper-go/config"
 	"github.com/fmotalleb/scrapper-go/engine/steps"
 	"github.com/fmotalleb/scrapper-go/log"
 	"github.com/fmotalleb/scrapper-go/utils"
+	playwright "github.com/mxschmitt/playwright-go"
 )
 
 func init() {
